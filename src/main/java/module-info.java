@@ -11,6 +11,7 @@ module edu.kean.musicplayersimulator {
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
     requires annotations;
+    requires java.desktop;
 
     opens edu.kean.musicplayersimulator to javafx.fxml;
     exports edu.kean.musicplayersimulator;

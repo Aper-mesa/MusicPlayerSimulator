@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public class Test extends Application {
+public class Player extends Application {
     final static int BUTTON_SIZE = 25;
 
     @Override

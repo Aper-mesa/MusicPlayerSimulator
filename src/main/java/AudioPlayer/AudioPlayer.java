@@ -1,3 +1,5 @@
+package AudioPlayer;
+
 import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +12,6 @@ public class AudioPlayer implements Runnable {
     private List<String> playlist = new ArrayList<>(); //Arraylist playlist
     private int currentTrackIndex = 0; //Current index of the playlist
     private int previousTrackIndex = -1; //Previous index of the playlist
-    private long lastPlayTime = 0; //Last Play time
     private Thread playThread; //Thread using to play.
 
     //Initialize the playlist and load the 1st song.
@@ -73,7 +74,8 @@ public class AudioPlayer implements Runnable {
             if (clip != null) {
                 clip.setMicrosecondPosition(pausePosition); //set to the pausing position and then start.
                 clip.start();
-                lastPlayTime = System.currentTimeMillis(); //record the current playing time
+                //Last Play time
+                long lastPlayTime = System.currentTimeMillis(); //record the current playing time
                 System.out.println("Playing: " + playlist.get(currentTrackIndex));
                 //check the status every 100ms.
                 while (clip.isRunning() && !Thread.interrupted()) {
@@ -158,8 +160,8 @@ public class AudioPlayer implements Runnable {
     public static void main(String[] args) {
         List<String> playlist = new ArrayList<>();
         //ArrayList include Two test Track from Local Folder.
-        playlist.add("/Users/ZENSOMNIA-If_1/Music/Caught_Fire.wav");
-        playlist.add("/Users/ZENSOMNIA-If_1/Music/Project 23 MR - 2021:7:9, 10.00 PM.wav");
+        playlist.add("C:/Program Files (x86)/CloudMusic/Dissonant Harmony.wav");
+        playlist.add("C:/Program Files (x86)/CloudMusic/Dissonant Harmony.wav");
 
         AudioPlayer player = new AudioPlayer(playlist);
 
