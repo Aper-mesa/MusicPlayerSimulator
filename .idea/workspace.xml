@@ -7,7 +7,10 @@
     <list default="true" id="98d3255a-1d00-49c5-9850-296761bb8e99" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/UI/Test.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/UI/Test.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/icons/downloadButton.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/icons/download.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/icons/downloadButtonHover.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/icons/downloadHover.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/icons/playButton.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/icons/play.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/icons/playButtonHover.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/icons/playHover.png" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -108,7 +111,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1731301482055</updated>
-      <workItem from="1731301483244" duration="9617000" />
+      <workItem from="1731301483244" duration="11141000" />
     </task>
     <servers />
   </component>
