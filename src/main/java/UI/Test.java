@@ -1,63 +1,109 @@
 package UI;
 
 import javafx.application.Application;
+import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 public class Test extends Application {
+    final static int BUTTON_SIZE = 25;
+
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Music Player Simulator");
 
-        Button downloadButton = new Button("Download");
-        Button playButton = new Button("Play");
+        Button downloadPageButton = new Button("Download");
+        Button playPageButton = new Button("Play");
 
-        HBox topBar = new HBox(10, downloadButton, playButton); // 10 是按钮间距
-        topBar.setStyle("-fx-padding: 6; -fx-background-color: #c9c9c9;"); // 设置背景色和内边距
+        HBox topBar = new HBox(10, downloadPageButton, playPageButton);
+        topBar.setStyle("-fx-padding: 6; -fx-background-color: #ececec;");
 
         StackPane downloadPage = new StackPane(new Label("Download Page"));
 
-        VBox playPage = new VBox(10); // 每行歌曲条目的间距
-        playPage.setStyle("-fx-padding: 10;");
+        VBox playPage = new VBox();
 
-        // 添加占位符歌曲信息
+        Image playIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/playButton.png")));
+        Image hoverPlayIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/playButtonHover.png")));
+
+        Image downloadIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/downloadButton.png")));
+        Image hoverDownloadIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/downloadButtonHover.png")));
+
         for (int i = 1; i <= 5; i++) {
-            HBox songRow = new HBox(20); // 每项之间的间距
-            Label songNumber = new Label(i + "");
+            HBox songRow = new HBox(10);
+            songRow.setPrefHeight(50);
+            songRow.setAlignment(Pos.CENTER_LEFT);
+
+            Label songNumber = new Label("   " + i);
             songNumber.setPrefWidth(50);
+            songNumber.setStyle("-fx-font-size: 16px;");
 
             Label songName = new Label("Song " + i);
-            songName.setPrefWidth(200);
+            songName.setPrefWidth(100);
+            songName.setStyle("-fx-font-size: 16px;");
 
-            Button playBtn = new Button("Play");
-            Button downloadBtn = new Button("Download");
+            Region spacer = new Region();
+            spacer.setMinWidth(Region.USE_COMPUTED_SIZE);
+            HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
 
-            songRow.getChildren().addAll(songNumber, songName, playBtn, downloadBtn);
+            Button playButton = getButton(playIcon, hoverPlayIcon);
+            Button downloadButton = getButton(downloadIcon, hoverDownloadIcon);
+
+            songRow.getChildren().addAll(songNumber, songName, spacer, playButton, downloadButton);
             playPage.getChildren().add(songRow);
+
+            songRow.setOnMouseEntered(event -> songRow.setStyle("-fx-background-color: #ececec;"));
+            songRow.setOnMouseExited(event -> songRow.setStyle("-fx-background-color: transparent;"));
         }
 
-        // 主布局
         BorderPane root = new BorderPane();
         root.setTop(topBar);
-
-        // 默认显示播放页面
         root.setCenter(playPage);
 
-        // 按钮事件：切换页面
-        downloadButton.setOnAction(event -> root.setCenter(downloadPage));
-        playButton.setOnAction(event -> root.setCenter(playPage));
+        downloadPageButton.setOnAction(event -> root.setCenter(downloadPage));
+        playPageButton.setOnAction(event -> root.setCenter(playPage));
 
-        // 场景设置
         Scene scene = new Scene(root, 800, 600);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
+    }
+
+    @NotNull
+    private static Button getButton(Image defaultIcon, Image hoverIcon) {
+        Button button = new Button();
+        ImageView iconView = new ImageView(defaultIcon);
+        iconView.setFitWidth(BUTTON_SIZE);
+        iconView.setFitHeight(BUTTON_SIZE);
+        iconView.setPreserveRatio(true);
+        button.setGraphic(iconView);
+        button.setStyle("-fx-background-color: transparent;");
+
+        button.setOnMouseEntered(event -> {
+            ImageView hoverIconView = new ImageView(hoverIcon);
+            hoverIconView.setFitWidth(BUTTON_SIZE);
+            hoverIconView.setFitHeight(BUTTON_SIZE);
+            hoverIconView.setPreserveRatio(true);
+            button.setGraphic(hoverIconView);
+            button.setCursor(Cursor.HAND);
+        });
+        button.setOnMouseExited(event -> {
+            ImageView defaultIconView = new ImageView(defaultIcon);
+            defaultIconView.setFitWidth(BUTTON_SIZE);
+            defaultIconView.setFitHeight(BUTTON_SIZE);
+            defaultIconView.setPreserveRatio(true);
+            button.setGraphic(defaultIconView);
+            button.setCursor(Cursor.DEFAULT);
+        });
+        return button;
     }
 
     public static void main(String[] args) {

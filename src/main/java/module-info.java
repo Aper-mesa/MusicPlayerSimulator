@@ -10,6 +10,7 @@ module edu.kean.musicplayersimulator {
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
+    requires annotations;
 
     opens edu.kean.musicplayersimulator to javafx.fxml;
     exports edu.kean.musicplayersimulator;
