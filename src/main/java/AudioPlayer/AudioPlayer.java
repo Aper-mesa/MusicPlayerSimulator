@@ -1,3 +1,5 @@
+package AudioPlayer;
+
 import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
@@ -7,15 +9,16 @@ import java.util.ArrayList;
 public class AudioPlayer implements Runnable {
     private Clip clip; // Clip object for songs.
     private long pausePosition = 0; // The position when paused.
-    private List<String> playlist = new ArrayList<>(); // Arraylist playlist
+    public List<String> playlist = new ArrayList<>(); // Arraylist playlist
     private int currentTrackIndex = 0; // Current index of the playlist
     private int previousTrackIndex = -1; // Previous index of the playlist
     private long lastPlayTime = 0; // Last Play time
     private Thread playThread; // Thread using to play.
 
     // Initialize the playlist and load the 1st song.
-    public AudioPlayer(List<String> playlist) {
-        this.playlist = playlist;
+    public AudioPlayer() {
+        playlist.add("C:/Program Files (x86)/CloudMusic/Dissonant Harmony.wav");
+        playlist.add("C:/Program Files (x86)/CloudMusic/Harmonious Dissonance.wav");
         loadTrack(currentTrackIndex);
     }
 
@@ -168,8 +171,7 @@ public class AudioPlayer implements Runnable {
             long currentMinutes = (currentTimeInSeconds % 3600) / 60;
             long currentSeconds = currentTimeInSeconds % 60;
 
-            System.out
-                    .println(String.format("Jumped to: %02d:%02d:%02d", currentHours, currentMinutes, currentSeconds));
+            System.out.printf("Jumped to: %02d:%02d:%02d%n", currentHours, currentMinutes, currentSeconds);
 
             play();
         }
@@ -188,12 +190,7 @@ public class AudioPlayer implements Runnable {
     }
 
     public static void main(String[] args) {
-        List<String> playlist = new ArrayList<>();
-        // ArrayList include Two test Track from Local Folder.
-        playlist.add("/Users/ZENSOMNIA-If_1/Music/Caught_Fire.wav");
-        playlist.add("/Users/ZENSOMNIA-If_1/Music/Project 23 MR - 2021:7:9, 10.00 PM.wav");
-
-        AudioPlayer player = new AudioPlayer(playlist);
+        AudioPlayer player = new AudioPlayer();
 
         // Play the first song.
         player.play();
