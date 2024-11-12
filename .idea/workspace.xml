@@ -63,7 +63,7 @@
       <recent name="C:\Users\Apermesa\IdeaProjects\MusicPlayerSimulator\src\main\java" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.AudioPlayer">
+  <component name="RunManager" selected="Application.Player">
     <configuration name="AudioPlayer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="AudioPlayer.AudioPlayer" />
       <module name="MusicPlayerSimulator" />
@@ -105,8 +105,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.AudioPlayer" />
         <item itemvalue="Application.Player" />
+        <item itemvalue="Application.AudioPlayer" />
         <item itemvalue="Application.HelloApplication" />
       </list>
     </recent_temporary>
