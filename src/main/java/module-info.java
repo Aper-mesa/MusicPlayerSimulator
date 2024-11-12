@@ -12,6 +12,7 @@ module edu.kean.musicplayersimulator {
     requires com.almasb.fxgl.all;
     requires annotations;
     requires java.desktop;
+    requires javafx.media;
 
     opens edu.kean.musicplayersimulator to javafx.fxml;
     exports edu.kean.musicplayersimulator;
