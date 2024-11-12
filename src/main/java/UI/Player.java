@@ -17,28 +17,31 @@ import java.util.Objects;
 
 public class Player extends Application {
     final static int BUTTON_SIZE = 25;
+    VBox playPage = new VBox();
+    BorderPane root = new BorderPane();
+    StackPane downloadPage = new StackPane(new Label("Download Page"));
 
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Music Player Simulator");
 
+        initContent();
+
+        loadPlayPage();
+
+        Scene scene = new Scene(root, 800, 600);
+        primaryStage.setScene(scene);
+        primaryStage.setResizable(false);
+        primaryStage.show();
+    }
+
+    //load constant content of the player
+    private void initContent() {
         Button downloadPageButton = new Button("Download");
         Button playPageButton = new Button("Play");
 
         HBox topBar = new HBox(10, downloadPageButton, playPageButton);
         topBar.setStyle("-fx-padding: 6; -fx-background-color: #ececec;");
-
-        StackPane downloadPage = new StackPane(new Label("Download Page"));
-
-        VBox playPage = new VBox();
-
-        Image playIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/play.png")));
-        Image hoverPlayIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/playHover.png")));
-
-        Image downloadIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/download.png")));
-        Image hoverDownloadIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/downloadHover.png")));
-
-        showSongs(playIcon, hoverPlayIcon, downloadIcon, hoverDownloadIcon, playPage);
 
         VBox playerBar = new VBox(10);
         playerBar.setStyle("-fx-background-color: #f0f0f0; -fx-padding: 10;");
@@ -70,21 +73,21 @@ public class Player extends Application {
 
         playerBar.getChildren().addAll(controls, progressBarContainer);
 
-        BorderPane root = new BorderPane();
         root.setTop(topBar);
         root.setCenter(playPage);
         root.setBottom(playerBar);
 
         downloadPageButton.setOnAction(event -> root.setCenter(downloadPage));
         playPageButton.setOnAction(event -> root.setCenter(playPage));
-
-        Scene scene = new Scene(root, 800, 600);
-        primaryStage.setScene(scene);
-        primaryStage.setResizable(false);
-        primaryStage.show();
     }
 
-    private void showSongs(Image playIcon, Image hoverPlayIcon, Image downloadIcon, Image hoverDownloadIcon, VBox playPage) {
+    private void loadPlayPage() {
+        Image playIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/play.png")));
+        Image hoverPlayIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/playHover.png")));
+
+        Image downloadIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/download.png")));
+        Image hoverDownloadIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/downloadHover.png")));
+
         for (int i = 1; i <= 5; i++) {
             HBox songRow = new HBox(10);
             songRow.setPrefHeight(50);
