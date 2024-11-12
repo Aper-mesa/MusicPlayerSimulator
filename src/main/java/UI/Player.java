@@ -19,7 +19,7 @@ public class Player extends Application {
     final static int BUTTON_SIZE = 25;
     VBox playPage = new VBox();
     BorderPane root = new BorderPane();
-    StackPane downloadPage = new StackPane(new Label("Download Page"));
+    VBox downloadPage = new VBox();
 
     @Override
     public void start(Stage primaryStage) {
@@ -28,8 +28,9 @@ public class Player extends Application {
         initContent();
 
         loadPlayPage();
+        loadDownloadPage();
 
-        Scene scene = new Scene(root, 800, 600);
+        Scene scene = new Scene(root, 650, 600);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
@@ -88,8 +89,8 @@ public class Player extends Application {
         Image downloadIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/download.png")));
         Image hoverDownloadIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/downloadHover.png")));
 
-        for (int i = 1; i <= 5; i++) {
-            HBox songRow = new HBox(10);
+        for (int i = 1; i <= 4; i++) {
+            HBox songRow = new HBox(5);
             songRow.setPrefHeight(50);
             songRow.setAlignment(Pos.CENTER_LEFT);
 
@@ -113,6 +114,44 @@ public class Player extends Application {
 
             songRow.setOnMouseEntered(event -> songRow.setStyle("-fx-background-color: #ececec;"));
             songRow.setOnMouseExited(event -> songRow.setStyle("-fx-background-color: transparent;"));
+        }
+    }
+
+    private void loadDownloadPage() {
+        Image pauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pause.png")));
+        Image hoverPauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pauseHover.png")));
+
+        Image cancelIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/cancel.png")));
+        Image hoverCancelIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/cancelHover.png")));
+
+        for (int i = 1; i <= 4; i++) {
+            HBox downloadRow = new HBox(5);
+            downloadRow.setPrefHeight(50);
+            downloadRow.setAlignment(Pos.CENTER_LEFT);
+
+            Label downloadNumber = new Label("   " + i);
+            downloadNumber.setPrefWidth(50);
+            downloadNumber.setStyle("-fx-font-size: 16px;");
+
+            Label songName = new Label("Song " + i);
+            songName.setPrefWidth(100);
+            songName.setStyle("-fx-font-size: 16px;");
+
+            Region spacer = new Region();
+            spacer.setMinWidth(Region.USE_COMPUTED_SIZE);
+            HBox.setHgrow(spacer, Priority.ALWAYS);
+
+            ProgressBar progressBar = new ProgressBar(0.0);
+            progressBar.setPrefWidth(200);
+
+            Button pauseButton = getButton(pauseIcon, hoverPauseIcon);
+            Button cancelButton = getButton(cancelIcon, hoverCancelIcon);
+
+            downloadRow.getChildren().addAll(downloadNumber, songName, spacer, progressBar, pauseButton, cancelButton);
+            downloadPage.getChildren().add(downloadRow);
+
+            downloadRow.setOnMouseEntered(event -> downloadRow.setStyle("-fx-background-color: #ececec;"));
+            downloadRow.setOnMouseExited(event -> downloadRow.setStyle("-fx-background-color: transparent;"));
         }
     }
 
