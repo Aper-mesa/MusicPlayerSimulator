@@ -1,5 +1,3 @@
-package AudioPlayer;
-
 import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
@@ -9,30 +7,33 @@ import java.util.ArrayList;
 public class AudioPlayer implements Runnable {
     private Clip clip; // Clip object for songs.
     private long pausePosition = 0; // The position when paused.
-    private List<String> playlist = new ArrayList<>(); //Arraylist playlist
-    private int currentTrackIndex = 0; //Current index of the playlist
-    private int previousTrackIndex = -1; //Previous index of the playlist
-    private Thread playThread; //Thread using to play.
+    private List<String> playlist = new ArrayList<>(); // Arraylist playlist
+    private int currentTrackIndex = 0; // Current index of the playlist
+    private int previousTrackIndex = -1; // Previous index of the playlist
+    private long lastPlayTime = 0; // Last Play time
+    private Thread playThread; // Thread using to play.
 
-    //Initialize the playlist and load the 1st song.
+    // Initialize the playlist and load the 1st song.
     public AudioPlayer(List<String> playlist) {
         this.playlist = playlist;
         loadTrack(currentTrackIndex);
     }
-    //Load the track from specific index
+
+    // Load the track from specific index
     private void loadTrack(int index) {
 
         try {
             if (clip != null && clip.isOpen()) {
                 clip.close();
             }
-            //get the audio input stream and open the clip.
+            // get the audio input stream and open the clip.
             AudioInputStream audioStream = AudioSystem.getAudioInputStream(new File(playlist.get(index)));
             clip = AudioSystem.getClip();
             clip.open(audioStream);
-            //Linelistener for when the song finished, play next automatically.
+            // Linelistener for when the song finished, play next automatically.
             clip.addLineListener(event -> {
-                if (event.getType() == LineEvent.Type.STOP && clip.getMicrosecondPosition() == clip.getMicrosecondLength()) {
+                if (event.getType() == LineEvent.Type.STOP
+                        && clip.getMicrosecondPosition() == clip.getMicrosecondLength()) {
                     playNext();
                 }
             });
@@ -41,12 +42,19 @@ public class AudioPlayer implements Runnable {
         }
     }
 
-    //use thread to play
+    // use thread to play, but add some
     public void play() {
-        playThread = new Thread(this);
-        playThread.start();
+        if (playThread == null || !playThread.isAlive()) {
+            playThread = new Thread(this);
+            playThread.start();
+        } else if (clip != null && !clip.isRunning()) {
+            clip.setMicrosecondPosition(pausePosition);
+            clip.start();
+            System.out.println("Resumed: " + playlist.get(currentTrackIndex));
+        }
     }
-    //pause the current playing, but not stop the thread.
+
+    // pause the current playing, but not stop the thread.
     public void pause() {
         if (clip != null && clip.isRunning()) {
             pausePosition = clip.getMicrosecondPosition();
@@ -54,7 +62,8 @@ public class AudioPlayer implements Runnable {
             System.out.println("Paused: " + playlist.get(currentTrackIndex));
         }
     }
-    //stop playing by interrupt the thread.
+
+    // stop playing by interrupt the thread.
     public void stop() {
         if (playThread != null) {
             playThread.interrupt();
@@ -63,7 +72,7 @@ public class AudioPlayer implements Runnable {
         if (clip != null) {
             clip.stop();
             clip.close();
-            pausePosition = 0; //reset the pausing position
+            pausePosition = 0; // reset the pausing position
             System.out.println("Stopped: " + playlist.get(currentTrackIndex));
         }
     }
@@ -72,42 +81,43 @@ public class AudioPlayer implements Runnable {
     public void run() {
         try {
             if (clip != null) {
-                clip.setMicrosecondPosition(pausePosition); //set to the pausing position and then start.
+                clip.setMicrosecondPosition(pausePosition); // set to the pausing position and then start.
                 clip.start();
-                //Last Play time
-                long lastPlayTime = System.currentTimeMillis(); //record the current playing time
+                lastPlayTime = System.currentTimeMillis(); // record the current playing time
                 System.out.println("Playing: " + playlist.get(currentTrackIndex));
-                //check the status every 100ms.
-                while (clip.isRunning() && !Thread.interrupted()) {
+
+                while (clip.isRunning() && !Thread.currentThread().isInterrupted()) {
                     Thread.sleep(100);
                 }
-                if (Thread.interrupted()) {
-                    System.out.println("Playback interrupted.");
-                } else {
+
+                if (!Thread.currentThread().isInterrupted()) {
                     System.out.println("Playback completed.");
                 }
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            System.out.println("Thread interrupted while waiting.");
+            System.out.println("Thread interrupted while playing.");
         }
     }
 
-    //Play next song.
+    // Play next song.
     public void playNext() {
+        stopCurrentClip();
+
         if (currentTrackIndex < playlist.size() - 1) {
             previousTrackIndex = currentTrackIndex;
-            currentTrackIndex++; //set to next song if avaliable.
+            currentTrackIndex++; // set to next song if avaliable
         } else {
             previousTrackIndex = currentTrackIndex;
-            currentTrackIndex = 0; //set to current song if there are no song at left.
+            currentTrackIndex = 0; // if not play the original
         }
-        pausePosition = 0; //reset pausing position.
-        loadTrack(currentTrackIndex); //load new song.
+
+        pausePosition = 0;
+        loadTrack(currentTrackIndex);
         play();
     }
 
-    //play previous song.
+    // play previous song.
     public void playPrevious() {
         //
         if (previousTrackIndex != -1) {
@@ -122,13 +132,14 @@ public class AudioPlayer implements Runnable {
     public void playUp() {
         if (clip != null && clip.isRunning()) {
             long currentTime = clip.getMicrosecondPosition();
-            //5s principle, if the song started to play after 5s, play up means that replay that song
+            // 5s principle, if the song started to play after 5s, play up means that replay
+            // that song
             if (currentTime >= 5000000) {
                 pausePosition = 0;
                 loadTrack(currentTrackIndex);
                 play();
             } else {
-                //5s principle, if pressed it in 5s, call play previous.
+                // 5s principle, if pressed it in 5s, call play previous.
                 playPrevious();
             }
         } else {
@@ -136,74 +147,91 @@ public class AudioPlayer implements Runnable {
         }
     }
 
+    // new one. when changed the playing song,, the current clip stoped
+    private void stopCurrentClip() {
+        if (clip != null && clip.isRunning()) {
+            clip.stop();
+            clip.close();
+        }
+    }
+
     public void jumpToTime(long timeInMicroseconds) {
         if (clip != null && clip.isOpen()) {
 
-            //set the clip to the parameter.
+            // set the clip to the parameter.
             clip.setMicrosecondPosition(timeInMicroseconds);
             pausePosition = timeInMicroseconds;
 
-            //transfer the microsecond to normal time format.
+            // transfer the microsecond to normal time format.
             long currentTimeInSeconds = timeInMicroseconds / 1000000;
             long currentHours = currentTimeInSeconds / 3600;
             long currentMinutes = (currentTimeInSeconds % 3600) / 60;
             long currentSeconds = currentTimeInSeconds % 60;
 
-            System.out.println(String.format("Jumped to: %02d:%02d:%02d", currentHours, currentMinutes, currentSeconds));
+            System.out
+                    .println(String.format("Jumped to: %02d:%02d:%02d", currentHours, currentMinutes, currentSeconds));
 
             play();
         }
     }
 
+    public double getPlaybackProgress() {
+        if (clip != null && clip.isOpen()) {
+            // get current playing status.
+            long currentPosition = clip.getMicrosecondPosition();
+            long totalLength = clip.getMicrosecondLength();
 
+            // return the progress.
+            return (double) currentPosition / totalLength * 100;
+        }
+        return 0.0;
+    }
 
     public static void main(String[] args) {
         List<String> playlist = new ArrayList<>();
-        //ArrayList include Two test Track from Local Folder.
-        playlist.add("C:/Program Files (x86)/CloudMusic/Dissonant Harmony.wav");
-        playlist.add("C:/Program Files (x86)/CloudMusic/Dissonant Harmony.wav");
+        // ArrayList include Two test Track from Local Folder.
+        playlist.add("/Users/ZENSOMNIA-If_1/Music/Caught_Fire.wav");
+        playlist.add("/Users/ZENSOMNIA-If_1/Music/Project 23 MR - 2021:7:9, 10.00 PM.wav");
 
         AudioPlayer player = new AudioPlayer(playlist);
 
-        //Play the first song.
+        // Play the first song.
         player.play();
 
         try {
             Thread.sleep(3000);
-            //after 3s paused.
+            // after 3s paused.
             player.pause();
-            //after 1s continue.
+            // after 1s continue.
             Thread.sleep(1000);
             player.play();
-            //after 10s, jumped to the 20s of the song, press play.
+            // after 10s, jumped to the 20s of the song, press play.
             Thread.sleep(10000);
             player.jumpToTime(20000000);
             player.play();
 
-            //after 10s, jumped to the 35s of the song, press play.
+            // after 10s, jumped to the 35s of the song, press play.
             Thread.sleep(10000);
             player.jumpToTime(35000000);
 
-            //after 10s, jumped to the 0, press play.
+            // after 10s, jumped to the 0, press play.
             Thread.sleep(10000);
             player.jumpToTime(10000);
 
-            //after 10s, play next song, press play.
+            // after 10s, play next song, press play.
             Thread.sleep(10000);
             player.playNext();
 
-            //after 10s, play up song but will play it again due to 5s principle, press play.
+            // after 10s, play up song but will play it again due to 5s principle, press
+            // play.
             Thread.sleep(10000);
             player.playUp();
 
-            //after 3s, play up song, press play
+            // after 3s, play up song, press play
             Thread.sleep(3000);
             player.playUp();
-
-            //after 10s, stop.
+            player.jumpToTime(20000000);
             Thread.sleep(10000);
-            player.stop();
-
 
         } catch (InterruptedException e) {
             e.printStackTrace();
