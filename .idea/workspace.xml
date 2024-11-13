@@ -6,7 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="98d3255a-1d00-49c5-9850-296761bb8e99" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/UI/Player.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/UI/Player.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/AudioPlayer/AudioPlayerFX.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/AudioPlayer/AudioPlayerFX.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,6 +24,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "zensomnia"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/Aper-mesa/MusicPlayerSimulator.git",
+    "accountId": "9b958365-de30-4143-bf47-758c9ec5e10e"
+  }
+}]]></component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -59,8 +72,9 @@
     "project.structure.last.edited": "Project",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "editor.preferences.completion",
-    "vue.rearranger.settings.migration": "true"
+    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "vue.rearranger.settings.migration": "true",
+    "应用程序.APFX3.executor": "Run"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -68,7 +82,7 @@
       <recent name="C:\Users\Apermesa\IdeaProjects\MusicPlayerSimulator\src\main\java" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.Player">
+  <component name="RunManager">
     <configuration name="App" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="UI.App" />
       <module name="MusicPlayerSimulator" />
@@ -121,14 +135,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Application.Player" />
-        <item itemvalue="Application.App" />
-        <item itemvalue="Application.AudioPlayer" />
-        <item itemvalue="Application.HelloApplication" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -150,6 +156,7 @@
       <workItem from="1731335231900" duration="346000" />
       <workItem from="1731389418573" duration="67000" />
       <workItem from="1731389554482" duration="2442000" />
+      <workItem from="1731461907204" duration="1665000" />
     </task>
     <servers />
   </component>

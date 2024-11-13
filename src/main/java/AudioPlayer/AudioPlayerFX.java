@@ -20,6 +20,12 @@ public class AudioPlayerFX {
         this.playlist = playlist;
         loadTrack(currentTrackIndex);
     }
+    // Non-arg.
+    public AudioPlayerFX()
+    {
+        playlist = new ArrayList<>();
+        loadTrack(currentTrackIndex);
+    }
 
     // Load the track from specific index
     private void loadTrack(int index) {
