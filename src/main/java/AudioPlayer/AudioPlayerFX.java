@@ -1,23 +1,27 @@
 package AudioPlayer;
 
 import javafx.application.Platform;
-import javafx.scene.media.*;
-import javafx.util.*;
-import java.io.*;
-import java.util.*;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 //This is the JavaFX edition of the AudioPlayer.
 public class AudioPlayerFX {
     private MediaPlayer mediaPlayer; // MediaPlayer object for songs.
-    private List<String> playlist; // Arraylist playlist.
+    private List<String> playlist = new ArrayList<>(); // Arraylist playlist.
     private int currentTrackIndex = 0; // Current index of the playlist
     // Removed Previous index of the playlist & Last Play time
     private Thread progressUpdater; // New Thread progress Updater
     private boolean isRunning = true; // Check if thread is running.
 
     // Initialize the Playlist. This time playlist is initialized at APFX3.java
-    public AudioPlayerFX(List<String> playlist) {
-        this.playlist = playlist;
+    public AudioPlayerFX() {
+        playlist.add("C:/Program Files (x86)/CloudMusic/Dissonant Harmony.wav");
+        playlist.add("C:/Program Files (x86)/CloudMusic/Harmonious Dissonance.wav");
         loadTrack(currentTrackIndex);
     }
 
@@ -37,6 +41,7 @@ public class AudioPlayerFX {
             e.printStackTrace();
         }
     }
+
     // Use mediaplayer to play. Changed the resumed to playing.
     public void play() {
         if (mediaPlayer != null) {
@@ -53,6 +58,7 @@ public class AudioPlayerFX {
             System.out.println("Paused: " + playlist.get(currentTrackIndex));
         }
     }
+
     // Stop playing by add false state for isRunning() the thread.
     public void stop() {
         if (mediaPlayer != null) {

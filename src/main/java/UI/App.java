@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public class Player extends Application {
+public class App extends Application {
     final static int BUTTON_SIZE = 25;
     VBox playPage = new VBox();
     BorderPane root = new BorderPane();

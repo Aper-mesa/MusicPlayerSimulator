@@ -18,11 +18,8 @@ public class APFX3 extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        List<String> playlist = new ArrayList<>();
-        playlist.add("C:/Program Files (x86)/CloudMusic/Dissonant Harmony.wav");
-        playlist.add("C:/Program Files (x86)/CloudMusic/Harmonious Dissonance.wav");
 
-        audioPlayer = new AudioPlayerFX(playlist);
+        audioPlayer = new AudioPlayerFX();
 
         Button playButton = new Button("Play");
         playButton.setOnAction(e -> audioPlayer.play());
