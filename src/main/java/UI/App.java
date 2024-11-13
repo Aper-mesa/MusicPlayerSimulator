@@ -1,5 +1,6 @@
 package UI;
 
+import AudioPlayer.AudioPlayerFX;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -13,6 +14,7 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Objects;
 
 public class App extends Application {
@@ -20,9 +22,12 @@ public class App extends Application {
     VBox playPage = new VBox();
     BorderPane root = new BorderPane();
     VBox downloadPage = new VBox();
+    List<String> playlist;
+    AudioPlayerFX player = new AudioPlayerFX();
 
     @Override
     public void start(Stage primaryStage) {
+        playlist = player.getPlaylist();
         primaryStage.setTitle("Music Player Simulator");
 
         initContent();
@@ -89,7 +94,7 @@ public class App extends Application {
         Image downloadIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/download.png")));
         Image hoverDownloadIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/downloadHover.png")));
 
-        for (int i = 1; i <= 4; i++) {
+        for (int i = 1; i < playlist.size(); i++) {
             HBox songRow = new HBox(5);
             songRow.setPrefHeight(50);
             songRow.setAlignment(Pos.CENTER_LEFT);
@@ -98,8 +103,7 @@ public class App extends Application {
             songNumber.setPrefWidth(50);
             songNumber.setStyle("-fx-font-size: 16px;");
 
-            Label songName = new Label("Song " + i);
-            songName.setPrefWidth(100);
+            Label songName = new Label(playlist.get(i));
             songName.setStyle("-fx-font-size: 16px;");
 
             Region spacer = new Region();
@@ -114,7 +118,13 @@ public class App extends Application {
 
             songRow.setOnMouseEntered(event -> songRow.setStyle("-fx-background-color: #ececec;"));
             songRow.setOnMouseExited(event -> songRow.setStyle("-fx-background-color: transparent;"));
+
+            playButton.setOnAction(e -> {
+                System.out.println("hit");
+            });
         }
+
+
     }
 
     private void loadDownloadPage() {

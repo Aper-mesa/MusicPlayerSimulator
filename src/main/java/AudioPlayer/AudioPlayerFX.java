@@ -12,7 +12,7 @@ import java.util.List;
 //This is the JavaFX edition of the AudioPlayer.
 public class AudioPlayerFX {
     private MediaPlayer mediaPlayer; // MediaPlayer object for songs.
-    private List<String> playlist = new ArrayList<>(); // Arraylist playlist.
+    public List<String> playlist = new ArrayList<>(); // Arraylist playlist.
     private int currentTrackIndex = 0; // Current index of the playlist
     // Removed Previous index of the playlist & Last Play time
     private Thread progressUpdater; // New Thread progress Updater
@@ -90,21 +90,6 @@ public class AudioPlayerFX {
         play();
     }
 
-    public void playUp() {
-        if (mediaPlayer != null) {
-            // 5s principle, if pressed it in 5s, call play previous.
-            // if the song started to play after 5s, play up means that replay
-            if (mediaPlayer.getCurrentTime().toSeconds() < 5) {
-                playPrevious();
-            } else {
-
-                mediaPlayer.seek(Duration.ZERO);
-                play();
-            }
-        }
-    }
-
-
     // Use Media's duration seconds instead of clip.setMicrosecond from AP(1st Generation)
     public void jumpToTime(double seconds) {
         if (mediaPlayer != null) {
@@ -146,5 +131,9 @@ public class AudioPlayerFX {
                 }
             }
         }
+    }
+
+    public List<String> getPlaylist() {
+        return playlist;
     }
 }
