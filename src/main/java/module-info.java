@@ -15,6 +15,7 @@ module edu.kean.musicplayersimulator {
     requires javafx.media;
 
     opens edu.kean.musicplayersimulator to javafx.fxml;
+    opens AudioPlayer to javafx.graphics;
     exports edu.kean.musicplayersimulator;
     exports UI;
     exports AudioPlayer;
