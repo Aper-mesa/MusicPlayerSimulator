@@ -94,12 +94,13 @@ public class App extends Application {
         Image downloadIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/download.png")));
         Image hoverDownloadIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/downloadHover.png")));
 
-        for (int i = 1; i < playlist.size(); i++) {
+        System.out.println(playlist.size());
+        for (int i = 0; i < playlist.size(); i++) {
             HBox songRow = new HBox(5);
             songRow.setPrefHeight(50);
             songRow.setAlignment(Pos.CENTER_LEFT);
 
-            Label songNumber = new Label("   " + i);
+            Label songNumber = new Label("   " + (i + 1));
             songNumber.setPrefWidth(50);
             songNumber.setStyle("-fx-font-size: 16px;");
 

@@ -22,15 +22,10 @@ public class AudioPlayerFX {
     public AudioPlayerFX() {
         playlist.add("C:/Program Files (x86)/CloudMusic/Dissonant Harmony.wav");
         playlist.add("C:/Program Files (x86)/CloudMusic/Harmonious Dissonance.wav");
-        loadTrack(currentTrackIndex);
     }
 
-    // Load the track from specific index
-    private void loadTrack(int index) {
-        if (mediaPlayer != null) {
-            mediaPlayer.stop();
-        }
-        // Get the media instead of get the audio input stream in AP(1st Generation)
+    // Use mediaplayer to play. Changed the resumed to playing.
+    public void play(int index) {
         try {
             Media media = new Media(new File(playlist.get(index)).toURI().toString());
             mediaPlayer = new MediaPlayer(media);
@@ -40,10 +35,6 @@ public class AudioPlayerFX {
             System.err.println("Error loading track: " + e.getMessage());
             e.printStackTrace();
         }
-    }
-
-    // Use mediaplayer to play. Changed the resumed to playing.
-    public void play() {
         if (mediaPlayer != null) {
             mediaPlayer.play();
             System.out.println("Playing: " + playlist.get(currentTrackIndex));
@@ -75,8 +66,7 @@ public class AudioPlayerFX {
         } else {
             currentTrackIndex = 0; // if not set the original
         }
-        loadTrack(currentTrackIndex);
-        play();
+        play(currentTrackIndex);
     }
 
     // Play previous song, but not directly called by the Testing APFX3, called via playUp()
@@ -86,8 +76,7 @@ public class AudioPlayerFX {
         } else {
             currentTrackIndex = playlist.size() - 1;
         }
-        loadTrack(currentTrackIndex);
-        play();
+        play(currentTrackIndex);
     }
 
     // Use Media's duration seconds instead of clip.setMicrosecond from AP(1st Generation)
