@@ -1,32 +1,31 @@
 package AudioPlayer;
 
 import javafx.application.Platform;
-import javafx.scene.media.*;
-import javafx.util.*;
-import java.io.*;
-import java.util.*;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 //This is the JavaFX edition of the AudioPlayer.
 public class AudioPlayerFX {
     private MediaPlayer mediaPlayer; // MediaPlayer object for songs.
-    private List<String> playlist; // Arraylist playlist.
+    public List<String> playlist = new ArrayList<>(); // Arraylist playlist.
     private int currentTrackIndex = 0; // Current index of the playlist
     // Removed Previous index of the playlist & Last Play time
     private Thread progressUpdater; // New Thread progress Updater
     private boolean isRunning = true; // Check if thread is running.
 
     // Initialize the Playlist. This time playlist is initialized at APFX3.java
-    public AudioPlayerFX(List<String> playlist) {
-        this.playlist = playlist;
-        loadTrack(currentTrackIndex);
+    public AudioPlayerFX() {
+        playlist.add("C:/Program Files (x86)/CloudMusic/Dissonant Harmony.wav");
+        playlist.add("C:/Program Files (x86)/CloudMusic/Harmonious Dissonance.wav");
     }
 
-    // Load the track from specific index
-    private void loadTrack(int index) {
-        if (mediaPlayer != null) {
-            mediaPlayer.stop();
-        }
-        // Get the media instead of get the audio input stream in AP(1st Generation)
+    // Use mediaplayer to play. Changed the resumed to playing.
+    public void play(int index) {
         try {
             Media media = new Media(new File(playlist.get(index)).toURI().toString());
             mediaPlayer = new MediaPlayer(media);
@@ -36,9 +35,6 @@ public class AudioPlayerFX {
             System.err.println("Error loading track: " + e.getMessage());
             e.printStackTrace();
         }
-    }
-    // Use mediaplayer to play. Changed the resumed to playing.
-    public void play() {
         if (mediaPlayer != null) {
             mediaPlayer.play();
             System.out.println("Playing: " + playlist.get(currentTrackIndex));
@@ -53,6 +49,7 @@ public class AudioPlayerFX {
             System.out.println("Paused: " + playlist.get(currentTrackIndex));
         }
     }
+
     // Stop playing by add false state for isRunning() the thread.
     public void stop() {
         if (mediaPlayer != null) {
@@ -69,8 +66,7 @@ public class AudioPlayerFX {
         } else {
             currentTrackIndex = 0; // if not set the original
         }
-        loadTrack(currentTrackIndex);
-        play();
+        play(currentTrackIndex);
     }
 
     // Play previous song, but not directly called by the Testing APFX3, called via playUp()
@@ -80,24 +76,8 @@ public class AudioPlayerFX {
         } else {
             currentTrackIndex = playlist.size() - 1;
         }
-        loadTrack(currentTrackIndex);
-        play();
+        play(currentTrackIndex);
     }
-
-    public void playUp() {
-        if (mediaPlayer != null) {
-            // 5s principle, if pressed it in 5s, call play previous.
-            // if the song started to play after 5s, play up means that replay
-            if (mediaPlayer.getCurrentTime().toSeconds() < 5) {
-                playPrevious();
-            } else {
-
-                mediaPlayer.seek(Duration.ZERO);
-                play();
-            }
-        }
-    }
-
 
     // Use Media's duration seconds instead of clip.setMicrosecond from AP(1st Generation)
     public void jumpToTime(double seconds) {
@@ -140,5 +120,9 @@ public class AudioPlayerFX {
                 }
             }
         }
+    }
+
+    public List<String> getPlaylist() {
+        return playlist;
     }
 }

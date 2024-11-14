@@ -4,14 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="98d3255a-1d00-49c5-9850-296761bb8e99" name="Changes" comment="Add new Player with FX. Code later">
-      <change afterPath="$PROJECT_DIR$/src/main/java/AudioPlayer/APFX3.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/AudioPlayer/AudioPlayerFX.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
+    <list default="true" id="98d3255a-1d00-49c5-9850-296761bb8e99" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/src/main/java/AudioPlayer/AudioPlayer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/AudioPlayer/AudioPlayer.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,18 +22,6 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory">{
-  &quot;lastFilter&quot;: {
-    &quot;state&quot;: &quot;OPEN&quot;,
-    &quot;assignee&quot;: &quot;zensomnia&quot;
-  }
-}</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/Aper-mesa/MusicPlayerSimulator.git&quot;,
-    &quot;accountId&quot;: &quot;12603304-701a-42dd-a8e5-fa0911c0d96b&quot;
-  }
-}</component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -51,16 +33,13 @@
   &quot;associatedIndex&quot;: 1
 }</component>
   <component name="ProjectId" id="2ogqHpgID2lfxYMH2BY5olUIIFw" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
-    <ConfirmationsSetting value="2" id="Add" />
-  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
-    &quot;Application.APFXTest.executor&quot;: &quot;Run&quot;,
     &quot;Application.AudioPlayer.executor&quot;: &quot;Run&quot;,
     &quot;Application.HelloApplication.executor&quot;: &quot;Run&quot;,
     &quot;Application.Player.executor&quot;: &quot;Run&quot;,
@@ -75,9 +54,6 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.completion&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
@@ -87,7 +63,7 @@
       <recent name="C:\Users\Apermesa\IdeaProjects\MusicPlayerSimulator\src\main\java" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.AudioPlayer">
+  <component name="RunManager" selected="Application.Player">
     <configuration name="AudioPlayer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="AudioPlayer.AudioPlayer" />
       <module name="MusicPlayerSimulator" />
@@ -138,8 +114,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-28b599e66164-intellij.indexing.shared.core-IU-242.23726.103" />
-        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-IU-242.23726.103" />
+        <option value="bundled-jdk-9823dce3aa75-28b599e66164-intellij.indexing.shared.core-IU-242.23339.11" />
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-IU-242.23339.11" />
       </set>
     </attachedChunks>
   </component>
@@ -153,18 +129,11 @@
       <updated>1731301482055</updated>
       <workItem from="1731301483244" duration="14306000" />
       <workItem from="1731335231900" duration="346000" />
-      <workItem from="1731380200973" duration="7038000" />
-      <workItem from="1731401691641" duration="2662000" />
-      <workItem from="1731421797562" duration="205000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
-  </component>
-  <component name="VcsManagerConfiguration">
-    <MESSAGE value="Add new Player with FX. Code later" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add new Player with FX. Code later" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
