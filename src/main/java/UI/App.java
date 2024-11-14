@@ -26,6 +26,8 @@ public class App extends Application {
     AudioPlayerFX player = new AudioPlayerFX();
     static ProgressBar progressBar = new ProgressBar(0.0);
     Label currentSongName = new Label("Playlist empty");
+    private boolean isPlaying = false;
+    Button playPauseButton;
 
     @Override
     public void start(Stage primaryStage) {
@@ -69,8 +71,13 @@ public class App extends Application {
         Image nextIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/next.png")));
         Image hoverNextIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/nextHover.png")));
 
+        Image playIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/play.png")));
+        Image hoverPlayIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/playHover.png")));
+        Image pauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pause.png")));
+        Image hoverPauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pauseHover.png")));
+
         Button prevButton = getButton(prevIcon, hoverPrevIcon);
-        Button playPauseButton = new Button("Play/Pause");
+        playPauseButton = !isPlaying ? getButton(pauseIcon, hoverPauseIcon) : getButton(playIcon, hoverPlayIcon);
         Button nextButton = getButton(nextIcon, hoverNextIcon);
         Button modeButton = new Button("Mode");
 
@@ -94,14 +101,26 @@ public class App extends Application {
         downloadPageButton.setOnAction(event -> root.setCenter(downloadPage));
         playPageButton.setOnAction(event -> root.setCenter(playPage));
 
-        playPauseButton.setOnAction(e -> player.pause());
+        playPauseButton.setOnAction(_ -> {
+            if (isPlaying) {
+                player.pause();
+                isPlaying = false;
+                setButton(playPauseButton, playIcon, hoverPlayIcon);
+            } else {
+                player.resume();
+                isPlaying = true;
+                setButton(playPauseButton, pauseIcon, hoverPauseIcon);
+            }
+        });
 
         nextButton.setOnAction(e -> {
             int index = player.playNext();
+            isPlaying = true;
             currentSongName.setText(playlist.get(index));
         });
         prevButton.setOnAction(e -> {
             int index = player.playPrevious();
+            isPlaying = true;
             currentSongName.setText(playlist.get(index));
         });
     }
@@ -141,12 +160,11 @@ public class App extends Application {
 
             int finalI = i;
             playButton.setOnAction(e -> {
+                isPlaying = true;
                 player.play(finalI);
                 currentSongName.setText(songName.getText());
             });
         }
-
-
     }
 
     private void loadDownloadPage() {
@@ -194,6 +212,11 @@ public class App extends Application {
     @NotNull
     private static Button getButton(Image defaultIcon, Image hoverIcon) {
         Button button = new Button();
+        modifyButton(defaultIcon, hoverIcon, button);
+        return button;
+    }
+
+    private static void modifyButton(Image defaultIcon, Image hoverIcon, Button button) {
         ImageView iconView = new ImageView(defaultIcon);
         iconView.setFitWidth(BUTTON_SIZE);
         iconView.setFitHeight(BUTTON_SIZE);
@@ -217,7 +240,18 @@ public class App extends Application {
             button.setGraphic(defaultIconView);
             button.setCursor(Cursor.DEFAULT);
         });
-        return button;
+    }
+
+    private void setButton(Button button, Image defaultIcon, Image hoverIcon) {
+        modifyButton(defaultIcon, hoverIcon, button);
+    }
+
+    public boolean isPlaying() {
+        return isPlaying;
+    }
+
+    public void setPlaying(boolean isPlaying) {
+        this.isPlaying = isPlaying;
     }
 
     public static void main(String[] args) {

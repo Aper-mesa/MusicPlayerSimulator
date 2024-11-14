@@ -45,6 +45,10 @@ public class AudioPlayerFX {
         }
     }
 
+    public void resume() {
+
+    }
+
     // pause the current playing, but not stop the thread.
     public void pause() {
         if (mediaPlayer != null) {
