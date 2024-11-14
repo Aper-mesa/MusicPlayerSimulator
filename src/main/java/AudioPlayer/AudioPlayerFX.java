@@ -6,9 +6,14 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 //This is the JavaFX edition of the AudioPlayer.
 public class AudioPlayerFX {
@@ -22,9 +27,11 @@ public class AudioPlayerFX {
 
     // Initialize the Playlist. This time playlist is initialized at APFX3.java
     public AudioPlayerFX() {
-        playlist.add("Dissonant Harmony.wav");
-        playlist.add("Harmonious Dissonance.wav");
-        playlist.add("Half Moon.mp3");
+        try (Stream<Path> files = Files.list(Paths.get("./src/main/resources/songs/"))) {
+            files.filter(Files::isRegularFile).forEach(file -> playlist.add(file.getFileName().toString()));
+        } catch (IOException e) {
+            System.out.println("读取文件夹时出错: " + e.getMessage());
+        }
     }
 
     // Use mediaplayer to play. Changed the resumed to playing.

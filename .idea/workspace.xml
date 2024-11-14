@@ -5,7 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="98d3255a-1d00-49c5-9850-296761bb8e99" name="Changes" comment="Add new Player with FX. Code later">
-      <change beforePath="$PROJECT_DIR$/src/main/java/UI/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/UI/App.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/songs/WoG2大桥颂歌（Apermesa个人版）.mp3" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/songs/[DEMO] The Cinder.mp3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/AudioPlayer/AudioPlayerFX.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/AudioPlayer/AudioPlayerFX.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -79,6 +82,7 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Apermesa\IdeaProjects\MusicPlayerSimulator\src\main\resources\songs" />
       <recent name="C:\Users\Apermesa\IdeaProjects\MusicPlayerSimulator\src\main\java" />
     </key>
   </component>
