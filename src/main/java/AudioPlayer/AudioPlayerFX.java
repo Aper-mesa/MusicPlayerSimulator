@@ -26,6 +26,10 @@ public class AudioPlayerFX {
 
     // Use mediaplayer to play. Changed the resumed to playing.
     public void play(int index) {
+        if (mediaPlayer != null)
+        {
+            mediaPlayer.stop();
+        }
         try {
             Media media = new Media(new File(playlist.get(index)).toURI().toString());
             mediaPlayer = new MediaPlayer(media);

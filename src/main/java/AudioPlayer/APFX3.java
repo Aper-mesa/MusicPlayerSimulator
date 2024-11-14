@@ -1,4 +1,4 @@
-package AudioPlayer;
+/*package AudioPlayer;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -68,4 +68,4 @@ public class APFX3 extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-}
+}*/
