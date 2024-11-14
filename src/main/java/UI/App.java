@@ -87,6 +87,9 @@ public class App extends Application {
         playPageButton.setOnAction(event -> root.setCenter(playPage));
 
         playPauseButton.setOnAction(e -> player.pause());
+
+        nextButton.setOnAction(e -> player.playNext());
+        prevButton.setOnAction(e -> player.playPrevious());
     }
 
     private void loadPlayPage() {
