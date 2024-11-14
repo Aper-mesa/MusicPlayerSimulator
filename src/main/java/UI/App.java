@@ -242,14 +242,6 @@ public class App extends Application {
         });
     }
 
-    public boolean isPlaying() {
-        return isPlaying;
-    }
-
-    public void setPlaying(boolean isPlaying) {
-        this.isPlaying = isPlaying;
-    }
-
     public static void main(String[] args) {
         launch(args);
     }
