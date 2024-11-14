@@ -29,6 +29,7 @@ public class AudioPlayerFX {
 
     // Use mediaplayer to play. Changed the resumed to playing.
     public void play(int index) {
+        currentTrackIndex = index;
         if (mediaPlayer != null) {
             mediaPlayer.stop();
         }
@@ -50,7 +51,7 @@ public class AudioPlayerFX {
         }
         if (mediaPlayer != null) {
             mediaPlayer.play();
-            System.out.println("Playing: " + playlist.get(currentTrackIndex));
+            System.out.println("Playing: " + playlist.get(index));
         }
     }
 
@@ -81,10 +82,10 @@ public class AudioPlayerFX {
 
     // Play next song
     public int playNext() {
-        if (currentTrackIndex < playlist.size() - 1) {
-            currentTrackIndex++; // set to next song if avaliable
+        if (currentTrackIndex == playlist.size() - 1) {
+            currentTrackIndex = 0;
         } else {
-            currentTrackIndex = 0; // if not set the original
+            currentTrackIndex++;
         }
         play(currentTrackIndex);
         return currentTrackIndex;
@@ -92,10 +93,10 @@ public class AudioPlayerFX {
 
     // Play previous song, but not directly called by the Testing APFX3, called via playUp()
     public int playPrevious() {
-        if (currentTrackIndex > 0) {
-            currentTrackIndex--;
-        } else {
+        if (currentTrackIndex == 0) {
             currentTrackIndex = playlist.size() - 1;
+        } else {
+            currentTrackIndex--;
         }
         play(currentTrackIndex);
         return currentTrackIndex;

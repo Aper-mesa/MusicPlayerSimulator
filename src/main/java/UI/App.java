@@ -28,11 +28,15 @@ public class App extends Application {
     Label currentSongName = new Label();
     private boolean isPlaying = false;
     Button playPauseButton;
+    Image pauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pause.png")));
+    Image hoverPauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pauseHover.png")));
 
     @Override
     public void start(Stage primaryStage) {
         playlist = player.getPlaylist();
         primaryStage.setTitle("Music Player Simulator");
+        Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/play.png")));
+        primaryStage.getIcons().add(icon);
 
         initContent();
 
@@ -62,7 +66,7 @@ public class App extends Application {
         HBox currentSong = new HBox(10);
         currentSong.setAlignment(Pos.CENTER);
 
-        currentSongName.setText(playlist.getFirst());
+        //currentSongName.setText(playlist.getFirst());
         currentSongName.setStyle("-fx-font-size: 16px;");
 
         currentSong.getChildren().add(currentSongName);
@@ -78,7 +82,7 @@ public class App extends Application {
         Image hoverPauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pauseHover.png")));
 
         Button prevButton = getButton(prevIcon, hoverPrevIcon);
-        playPauseButton = !isPlaying ? getButton(pauseIcon, hoverPauseIcon) : getButton(playIcon, hoverPlayIcon);
+        playPauseButton = isPlaying ? getButton(pauseIcon, hoverPauseIcon) : getButton(playIcon, hoverPlayIcon);
         Button nextButton = getButton(nextIcon, hoverNextIcon);
         Button modeButton = new Button("Mode");
 
@@ -118,11 +122,13 @@ public class App extends Application {
             int index = player.playNext();
             isPlaying = true;
             currentSongName.setText(playlist.get(index));
+            modifyButton(pauseIcon, hoverPauseIcon, playPauseButton);
         });
         prevButton.setOnAction(_ -> {
             int index = player.playPrevious();
             isPlaying = true;
             currentSongName.setText(playlist.get(index));
+            modifyButton(pauseIcon, hoverPauseIcon, playPauseButton);
         });
     }
 
@@ -133,7 +139,6 @@ public class App extends Application {
         Image downloadIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/download.png")));
         Image hoverDownloadIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/downloadHover.png")));
 
-        System.out.println(playlist.size());
         for (int i = 0; i < playlist.size(); i++) {
             HBox songRow = new HBox(5);
             songRow.setPrefHeight(50);
@@ -164,14 +169,12 @@ public class App extends Application {
                 isPlaying = true;
                 player.play(finalI);
                 currentSongName.setText(songName.getText());
+                modifyButton(pauseIcon, hoverPauseIcon, playPauseButton);
             });
         }
     }
 
     private void loadDownloadPage() {
-        Image pauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pause.png")));
-        Image hoverPauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pauseHover.png")));
-
         Image cancelIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/cancel.png")));
         Image hoverCancelIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/cancelHover.png")));
 
