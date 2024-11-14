@@ -98,27 +98,27 @@ public class App extends Application {
         root.setCenter(playPage);
         root.setBottom(playerBar);
 
-        downloadPageButton.setOnAction(event -> root.setCenter(downloadPage));
-        playPageButton.setOnAction(event -> root.setCenter(playPage));
+        downloadPageButton.setOnAction(_ -> root.setCenter(downloadPage));
+        playPageButton.setOnAction(_ -> root.setCenter(playPage));
 
         playPauseButton.setOnAction(_ -> {
             if (isPlaying) {
                 player.pause();
                 isPlaying = false;
-                setButton(playPauseButton, playIcon, hoverPlayIcon);
+                modifyButton(playIcon, hoverPlayIcon, playPauseButton);
             } else {
                 player.resume();
                 isPlaying = true;
-                setButton(playPauseButton, pauseIcon, hoverPauseIcon);
+                modifyButton(pauseIcon, hoverPauseIcon, playPauseButton);
             }
         });
 
-        nextButton.setOnAction(e -> {
+        nextButton.setOnAction(_ -> {
             int index = player.playNext();
             isPlaying = true;
             currentSongName.setText(playlist.get(index));
         });
-        prevButton.setOnAction(e -> {
+        prevButton.setOnAction(_ -> {
             int index = player.playPrevious();
             isPlaying = true;
             currentSongName.setText(playlist.get(index));
@@ -155,11 +155,11 @@ public class App extends Application {
             songRow.getChildren().addAll(songNumber, songName, spacer, playButton, downloadButton);
             playPage.getChildren().add(songRow);
 
-            songRow.setOnMouseEntered(event -> songRow.setStyle("-fx-background-color: #ececec;"));
-            songRow.setOnMouseExited(event -> songRow.setStyle("-fx-background-color: transparent;"));
+            songRow.setOnMouseEntered(_ -> songRow.setStyle("-fx-background-color: #ececec;"));
+            songRow.setOnMouseExited(_ -> songRow.setStyle("-fx-background-color: transparent;"));
 
             int finalI = i;
-            playButton.setOnAction(e -> {
+            playButton.setOnAction(_ -> {
                 isPlaying = true;
                 player.play(finalI);
                 currentSongName.setText(songName.getText());
@@ -200,8 +200,8 @@ public class App extends Application {
             downloadRow.getChildren().addAll(downloadNumber, songName, spacer, progressBar, pauseButton, cancelButton);
             downloadPage.getChildren().add(downloadRow);
 
-            downloadRow.setOnMouseEntered(event -> downloadRow.setStyle("-fx-background-color: #ececec;"));
-            downloadRow.setOnMouseExited(event -> downloadRow.setStyle("-fx-background-color: transparent;"));
+            downloadRow.setOnMouseEntered(_ -> downloadRow.setStyle("-fx-background-color: #ececec;"));
+            downloadRow.setOnMouseExited(_ -> downloadRow.setStyle("-fx-background-color: transparent;"));
         }
     }
 
@@ -224,7 +224,7 @@ public class App extends Application {
         button.setGraphic(iconView);
         button.setStyle("-fx-background-color: transparent;");
 
-        button.setOnMouseEntered(event -> {
+        button.setOnMouseEntered(_ -> {
             ImageView hoverIconView = new ImageView(hoverIcon);
             hoverIconView.setFitWidth(BUTTON_SIZE);
             hoverIconView.setFitHeight(BUTTON_SIZE);
@@ -232,7 +232,7 @@ public class App extends Application {
             button.setGraphic(hoverIconView);
             button.setCursor(Cursor.HAND);
         });
-        button.setOnMouseExited(event -> {
+        button.setOnMouseExited(_ -> {
             ImageView defaultIconView = new ImageView(defaultIcon);
             defaultIconView.setFitWidth(BUTTON_SIZE);
             defaultIconView.setFitHeight(BUTTON_SIZE);
@@ -240,10 +240,6 @@ public class App extends Application {
             button.setGraphic(defaultIconView);
             button.setCursor(Cursor.DEFAULT);
         });
-    }
-
-    private void setButton(Button button, Image defaultIcon, Image hoverIcon) {
-        modifyButton(defaultIcon, hoverIcon, button);
     }
 
     public boolean isPlaying() {
