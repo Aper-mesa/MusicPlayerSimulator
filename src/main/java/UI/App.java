@@ -19,19 +19,19 @@ import java.util.Objects;
 
 public class App extends Application {
     final static int BUTTON_SIZE = 25;
+    static ProgressBar progressBar = new ProgressBar(0.0);
     VBox playPage = new VBox();
-    BorderPane root = new BorderPane();
     VBox downloadPage = new VBox();
+    BorderPane root = new BorderPane();
     List<String> playlist;
     AudioPlayerFX player = new AudioPlayerFX();
-    static ProgressBar progressBar = new ProgressBar(0.0);
     Label currentSongName = new Label();
-    private boolean isPlaying = false;
     Button playPauseButton;
     Button modeButton;
     Image pauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pause.png")));
     Image hoverPauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pauseHover.png")));
-    private boolean isCycle = true;
+    boolean isPlaying = false;
+    boolean isCycle = true;
 
     @Override
     public void start(Stage primaryStage) {
