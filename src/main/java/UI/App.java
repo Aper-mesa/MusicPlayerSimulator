@@ -85,6 +85,8 @@ public class App extends Application {
 
         downloadPageButton.setOnAction(event -> root.setCenter(downloadPage));
         playPageButton.setOnAction(event -> root.setCenter(playPage));
+
+        playPauseButton.setOnAction(e -> player.pause());
     }
 
     private void loadPlayPage() {
