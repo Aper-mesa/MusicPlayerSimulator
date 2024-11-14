@@ -64,23 +64,25 @@ public class AudioPlayerFX {
     }
 
     // Play next song
-    public void playNext() {
+    public int playNext() {
         if (currentTrackIndex < playlist.size() - 1) {
             currentTrackIndex++; // set to next song if avaliable
         } else {
             currentTrackIndex = 0; // if not set the original
         }
         play(currentTrackIndex);
+        return currentTrackIndex;
     }
 
     // Play previous song, but not directly called by the Testing APFX3, called via playUp()
-    public void playPrevious() {
+    public int playPrevious() {
         if (currentTrackIndex > 0) {
             currentTrackIndex--;
         } else {
             currentTrackIndex = playlist.size() - 1;
         }
         play(currentTrackIndex);
+        return currentTrackIndex;
     }
 
     // Use Media's duration seconds instead of clip.setMicrosecond from AP(1st Generation)

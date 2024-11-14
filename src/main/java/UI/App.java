@@ -25,6 +25,7 @@ public class App extends Application {
     List<String> playlist;
     AudioPlayerFX player = new AudioPlayerFX();
     static ProgressBar progressBar = new ProgressBar(0.0);
+    Label currentSongName = new Label("Playlist empty");
 
     @Override
     public void start(Stage primaryStage) {
@@ -56,6 +57,13 @@ public class App extends Application {
         HBox controls = new HBox(10);
         controls.setAlignment(Pos.CENTER);
 
+        HBox currentSong = new HBox(10);
+        currentSong.setAlignment(Pos.CENTER);
+
+        currentSongName.setStyle("-fx-font-size: 16px;");
+
+        currentSong.getChildren().add(currentSongName);
+
         Image prevIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/previous.png")));
         Image hoverPrevIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/previousHover.png")));
         Image nextIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/next.png")));
@@ -77,7 +85,7 @@ public class App extends Application {
         HBox progressBarContainer = new HBox(progressBar);
         progressBarContainer.setAlignment(Pos.CENTER);
 
-        playerBar.getChildren().addAll(controls, progressBarContainer);
+        playerBar.getChildren().addAll(currentSong, controls, progressBarContainer);
 
         root.setTop(topBar);
         root.setCenter(playPage);
@@ -88,8 +96,14 @@ public class App extends Application {
 
         playPauseButton.setOnAction(e -> player.pause());
 
-        nextButton.setOnAction(e -> player.playNext());
-        prevButton.setOnAction(e -> player.playPrevious());
+        nextButton.setOnAction(e -> {
+            int index = player.playNext();
+            currentSongName.setText(playlist.get(index));
+        });
+        prevButton.setOnAction(e -> {
+            int index = player.playPrevious();
+            currentSongName.setText(playlist.get(index));
+        });
     }
 
     private void loadPlayPage() {
@@ -128,6 +142,7 @@ public class App extends Application {
             int finalI = i;
             playButton.setOnAction(e -> {
                 player.play(finalI);
+                currentSongName.setText(songName.getText());
             });
         }
 
