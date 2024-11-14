@@ -24,6 +24,7 @@ public class App extends Application {
     VBox downloadPage = new VBox();
     List<String> playlist;
     AudioPlayerFX player = new AudioPlayerFX();
+    static ProgressBar progressBar = new ProgressBar(0.0);
 
     @Override
     public void start(Stage primaryStage) {
@@ -72,7 +73,6 @@ public class App extends Application {
 
         controls.getChildren().addAll(spacer1, prevButton, playPauseButton, nextButton, modeButton, spacer2);
 
-        ProgressBar progressBar = new ProgressBar(0.0);
         progressBar.setPrefWidth(400);
         HBox progressBarContainer = new HBox(progressBar);
         progressBarContainer.setAlignment(Pos.CENTER);
@@ -165,6 +165,10 @@ public class App extends Application {
             downloadRow.setOnMouseEntered(event -> downloadRow.setStyle("-fx-background-color: #ececec;"));
             downloadRow.setOnMouseExited(event -> downloadRow.setStyle("-fx-background-color: transparent;"));
         }
+    }
+
+    public static void updatePlayProgress(double progress) {
+        progressBar.setProgress(progress);
     }
 
     @NotNull

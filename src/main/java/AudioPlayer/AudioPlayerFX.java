@@ -1,5 +1,6 @@
 package AudioPlayer;
 
+import UI.App;
 import javafx.application.Platform;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -26,8 +27,7 @@ public class AudioPlayerFX {
 
     // Use mediaplayer to play. Changed the resumed to playing.
     public void play(int index) {
-        if (mediaPlayer != null)
-        {
+        if (mediaPlayer != null) {
             mediaPlayer.stop();
         }
         try {
@@ -97,7 +97,7 @@ public class AudioPlayerFX {
             Duration currentTime = mediaPlayer.getCurrentTime();
             Duration totalDuration = mediaPlayer.getTotalDuration();
             if (totalDuration != null && totalDuration.greaterThan(Duration.ZERO)) {
-                return (currentTime.toMillis() / totalDuration.toMillis()) * 100;
+                return (currentTime.toMillis() / totalDuration.toMillis());
             }
         }
         return 0.0;
@@ -116,7 +116,7 @@ public class AudioPlayerFX {
         public void run() {
             while (isRunning && mediaPlayer != null) {
                 double progress = getPlaybackProgress();
-                Platform.runLater(() -> System.out.println("Current Progress: " + progress + "%"));
+                Platform.runLater(() -> App.updatePlayProgress(progress));
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
