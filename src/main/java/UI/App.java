@@ -28,8 +28,10 @@ public class App extends Application {
     Label currentSongName = new Label();
     private boolean isPlaying = false;
     Button playPauseButton;
+    Button modeButton;
     Image pauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pause.png")));
     Image hoverPauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pauseHover.png")));
+    private boolean isCycle = true;
 
     @Override
     public void start(Stage primaryStage) {
@@ -54,6 +56,11 @@ public class App extends Application {
         Button downloadPageButton = new Button("Download");
         Button playPageButton = new Button("Play");
 
+        downloadPageButton.setOnMouseEntered(_ -> downloadPageButton.setCursor(Cursor.HAND));
+        playPageButton.setOnMouseEntered(_ -> playPageButton.setCursor(Cursor.HAND));
+        downloadPageButton.setOnMouseExited(_ -> downloadPageButton.setCursor(Cursor.DEFAULT));
+        playPageButton.setOnMouseExited(_ -> playPageButton.setCursor(Cursor.DEFAULT));
+
         HBox topBar = new HBox(10, downloadPageButton, playPageButton);
         topBar.setStyle("-fx-padding: 6; -fx-background-color: #ececec;");
 
@@ -66,7 +73,6 @@ public class App extends Application {
         HBox currentSong = new HBox(10);
         currentSong.setAlignment(Pos.CENTER);
 
-        //currentSongName.setText(playlist.getFirst());
         currentSongName.setStyle("-fx-font-size: 16px;");
 
         currentSong.getChildren().add(currentSongName);
@@ -81,10 +87,15 @@ public class App extends Application {
         Image pauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pause.png")));
         Image hoverPauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pauseHover.png")));
 
+        Image cycleIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/cycle.png")));
+        Image hoverCycleIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/cycleHover.png")));
+        Image randomIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/random.png")));
+        Image hoverRandomIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/randomHover.png")));
+
         Button prevButton = getButton(prevIcon, hoverPrevIcon);
         playPauseButton = isPlaying ? getButton(pauseIcon, hoverPauseIcon) : getButton(playIcon, hoverPlayIcon);
         Button nextButton = getButton(nextIcon, hoverNextIcon);
-        Button modeButton = new Button("Mode");
+        modeButton = isCycle ? getButton(cycleIcon, hoverCycleIcon) : getButton(randomIcon, hoverRandomIcon);
 
         Region spacer1 = new Region();
         Region spacer2 = new Region();
@@ -129,6 +140,16 @@ public class App extends Application {
             isPlaying = true;
             currentSongName.setText(playlist.get(index));
             modifyButton(pauseIcon, hoverPauseIcon, playPauseButton);
+        });
+
+        modeButton.setOnAction(_ -> {
+            if (isCycle) {
+                isCycle = false;
+                modifyButton(randomIcon, hoverRandomIcon, modeButton);
+            } else {
+                isCycle = true;
+                modifyButton(cycleIcon, hoverCycleIcon, modeButton);
+            }
         });
     }
 
