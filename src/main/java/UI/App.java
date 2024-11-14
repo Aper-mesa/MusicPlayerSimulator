@@ -120,8 +120,9 @@ public class App extends Application {
             songRow.setOnMouseEntered(event -> songRow.setStyle("-fx-background-color: #ececec;"));
             songRow.setOnMouseExited(event -> songRow.setStyle("-fx-background-color: transparent;"));
 
+            int finalI = i;
             playButton.setOnAction(e -> {
-                System.out.println("hit");
+                player.play(finalI);
             });
         }
 
