@@ -1,6 +1,5 @@
 package AudioPlayer;
 
-import UI.App;
 import javafx.application.Platform;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -9,6 +8,8 @@ import javafx.util.Duration;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.net.URL;
+import java.util.Objects;
 
 //This is the JavaFX edition of the AudioPlayer.
 public class AudioPlayerFX {
@@ -19,20 +20,30 @@ public class AudioPlayerFX {
     private Thread progressUpdater; // New Thread progress Updater
     private boolean isRunning = true; // Check if thread is running.
 
+
     // Initialize the Playlist. This time playlist is initialized at APFX3.java
     public AudioPlayerFX() {
-        playlist.add("C:/Program Files (x86)/CloudMusic/Dissonant Harmony.wav");
-        playlist.add("C:/Program Files (x86)/CloudMusic/Harmonious Dissonance.wav");
+        playlist.add("/songs/Dissonant Harmony.wav");
+        playlist.add("/songs/Harmonious Dissonance.wav");
+        playlist.add("/songs/Half Moon.mp3");
     }
 
     // Use mediaplayer to play. Changed the resumed to playing.
     public void play(int index) {
-        if (mediaPlayer != null) {
+        if (mediaPlayer != null)
+        {
             mediaPlayer.stop();
         }
         try {
-            Media media = new Media(new File(playlist.get(index)).toURI().toString());
-            mediaPlayer = new MediaPlayer(media);
+            String trackPath = playlist.get(index);
+            URL resource = getClass().getResource(trackPath);
+            if (resource != null) {
+                Media media = new Media(resource.toString());
+                mediaPlayer = new MediaPlayer(media);
+                startProgressUpdater();
+            } else {
+                System.err.println("Track not found: " + trackPath);
+            }
 
             startProgressUpdater();
         } catch (Exception e) {
@@ -46,7 +57,10 @@ public class AudioPlayerFX {
     }
 
     public void resume() {
-
+        if (mediaPlayer != null) {
+            mediaPlayer.play();
+            System.out.println("Resumed: " + playlist.get(currentTrackIndex));
+        }
     }
 
     // pause the current playing, but not stop the thread.
@@ -103,7 +117,7 @@ public class AudioPlayerFX {
             Duration currentTime = mediaPlayer.getCurrentTime();
             Duration totalDuration = mediaPlayer.getTotalDuration();
             if (totalDuration != null && totalDuration.greaterThan(Duration.ZERO)) {
-                return (currentTime.toMillis() / totalDuration.toMillis());
+                return (currentTime.toMillis() / totalDuration.toMillis()) * 100;
             }
         }
         return 0.0;
@@ -122,7 +136,7 @@ public class AudioPlayerFX {
         public void run() {
             while (isRunning && mediaPlayer != null) {
                 double progress = getPlaybackProgress();
-                Platform.runLater(() -> App.updatePlayProgress(progress));
+                Platform.runLater(() -> System.out.println("Current Progress: " + progress + "%"));
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
@@ -132,7 +146,17 @@ public class AudioPlayerFX {
         }
     }
 
-    public List<String> getPlaylist() {
-        return playlist;
+    public List<String> getPlaylist()
+    {
+        List<String> formattedPlaylist = new ArrayList<>();
+        for (String track : playlist) {
+            String[] parts = track.split("/");
+            String fileName = parts[parts.length - 1];
+
+            String formattedName = fileName.split("\\.")[0];
+
+            formattedPlaylist.add(formattedName);
+        }
+        return formattedPlaylist;
     }
 }
