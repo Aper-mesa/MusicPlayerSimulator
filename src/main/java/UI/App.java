@@ -150,6 +150,7 @@ public class App extends Application {
                 isCycle = true;
                 modifyButton(cycleIcon, hoverCycleIcon, modeButton);
             }
+            player.setIsCycleMode(isCycle);
         });
     }
 
