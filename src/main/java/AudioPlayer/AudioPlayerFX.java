@@ -6,11 +6,9 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 
-import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.net.URL;
-import java.util.Objects;
 
 //This is the JavaFX edition of the AudioPlayer.
 public class AudioPlayerFX {
@@ -24,19 +22,18 @@ public class AudioPlayerFX {
 
     // Initialize the Playlist. This time playlist is initialized at APFX3.java
     public AudioPlayerFX() {
-        playlist.add("/songs/Dissonant Harmony.wav");
-        playlist.add("/songs/Harmonious Dissonance.wav");
-        playlist.add("/songs/Half Moon.mp3");
+        playlist.add("Dissonant Harmony.wav");
+        playlist.add("Harmonious Dissonance.wav");
+        playlist.add("Half Moon.mp3");
     }
 
     // Use mediaplayer to play. Changed the resumed to playing.
     public void play(int index) {
-        if (mediaPlayer != null)
-        {
+        if (mediaPlayer != null) {
             mediaPlayer.stop();
         }
         try {
-            String trackPath = playlist.get(index);
+            String trackPath = "/songs/" + playlist.get(index);
             URL resource = getClass().getResource(trackPath);
             if (resource != null) {
                 Media media = new Media(resource.toString());
@@ -147,17 +144,7 @@ public class AudioPlayerFX {
         }
     }
 
-    public List<String> getPlaylist()
-    {
-        List<String> formattedPlaylist = new ArrayList<>();
-        for (String track : playlist) {
-            String[] parts = track.split("/");
-            String fileName = parts[parts.length - 1];
-
-            String formattedName = fileName.split("\\.")[0];
-
-            formattedPlaylist.add(formattedName);
-        }
-        return formattedPlaylist;
+    public List<String> getPlaylist() {
+        return playlist;
     }
 }
