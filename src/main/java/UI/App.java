@@ -25,7 +25,7 @@ public class App extends Application {
     List<String> playlist;
     AudioPlayerFX player = new AudioPlayerFX();
     static ProgressBar progressBar = new ProgressBar(0.0);
-    Label currentSongName = new Label("Playlist empty");
+    Label currentSongName = new Label();
     private boolean isPlaying = false;
     Button playPauseButton;
 
@@ -62,6 +62,7 @@ public class App extends Application {
         HBox currentSong = new HBox(10);
         currentSong.setAlignment(Pos.CENTER);
 
+        currentSongName.setText(playlist.getFirst());
         currentSongName.setStyle("-fx-font-size: 16px;");
 
         currentSong.getChildren().add(currentSongName);
