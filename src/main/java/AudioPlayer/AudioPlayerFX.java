@@ -181,6 +181,10 @@ public class AudioPlayerFX {
         }));
         proTimeline.setCycleCount(Timeline.INDEFINITE);
         proTimeline.play();
+        Timeline currentTime = new Timeline(new KeyFrame(Duration.seconds(1),
+                _ -> Platform.runLater(() -> App.updateCurrentTime(mediaPlayer.getCurrentTime()))));
+        currentTime.setCycleCount(Timeline.INDEFINITE);
+        currentTime.play();
     }
 
     public List<String> getPlaylist() {

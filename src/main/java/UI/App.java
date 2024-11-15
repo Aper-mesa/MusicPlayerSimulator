@@ -34,6 +34,7 @@ public class App extends Application {
     Image hoverPauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pauseHover.png")));
     boolean isPlaying = false;
     boolean isCycle = true;
+    static Label currentTime = new Label("00: 00");
     static Label songDuration = new Label("00: 00");
 
     @Override
@@ -107,10 +108,8 @@ public class App extends Application {
 
         controls.getChildren().addAll(spacer1, prevButton, playPauseButton, nextButton, modeButton, spacer2);
 
-        Label currentTime = new Label("00: 00");
-
         progressBar.setPrefWidth(400);
-        HBox progressBarContainer = new HBox();
+        HBox progressBarContainer = new HBox(10);
         progressBarContainer.getChildren().addAll(currentTime, progressBar, songDuration);
 
         progressBarContainer.setAlignment(Pos.CENTER);
@@ -247,11 +246,19 @@ public class App extends Application {
         // update song name on the play bar
         currentSongName.setText(playlist.get(index));
         // display song duration
+        formatTime(duration, songDuration);
+    }
+
+    private static void formatTime(Duration duration, Label songDuration) {
         double totalSeconds = duration.toSeconds();
         long minutes = TimeUnit.SECONDS.toMinutes((long) totalSeconds);
         long seconds = (long) totalSeconds - TimeUnit.MINUTES.toSeconds(minutes);
         String formattedDuration = String.format("%02d:%02d", minutes, seconds);
         songDuration.setText(formattedDuration);
+    }
+
+    public static void updateCurrentTime(Duration duration) {
+        formatTime(duration, currentTime);
     }
 
     @NotNull
