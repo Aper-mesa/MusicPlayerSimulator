@@ -23,9 +23,9 @@ public class App extends Application {
     VBox playPage = new VBox();
     VBox downloadPage = new VBox();
     BorderPane root = new BorderPane();
-    List<String> playlist;
+    static List<String> playlist;
     AudioPlayerFX player = new AudioPlayerFX();
-    Label currentSongName = new Label();
+    static Label currentSongName = new Label();
     Button playPauseButton;
     Button modeButton;
     Image pauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pause.png")));
@@ -233,6 +233,11 @@ public class App extends Application {
 
     public static void updatePlayProgress(double progress) {
         progressBar.setProgress(progress);
+    }
+
+    // used when a song is finished
+    public static void updatePlayBarSongName(int index) {
+        currentSongName.setText(playlist.get(index));
     }
 
     @NotNull

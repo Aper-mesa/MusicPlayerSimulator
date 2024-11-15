@@ -1,12 +1,14 @@
 package AudioPlayer;
 
 import UI.App;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
-import javafx.animation.*;
-import javafx.beans.property.*;
 
 import java.io.IOException;
 import java.net.URL;
@@ -22,14 +24,14 @@ import java.util.stream.Stream;
 public class AudioPlayerFX {
     private MediaPlayer mediaPlayer; // MediaPlayer object for songs.
     public List<String> playlist = new ArrayList<>(); // Arraylist playlist.
-    private List<Integer> historyList = new ArrayList<>();
-    private List<Integer> playedIndices = new ArrayList<>();
+    private final List<Integer> historyList = new ArrayList<>();
+    private final List<Integer> playedIndices = new ArrayList<>();
 
     private int currentTrackIndex = 0; // Current index of the playlist
-    private BooleanProperty isCycleMode = new SimpleBooleanProperty(true);
+    private final BooleanProperty isCycleMode = new SimpleBooleanProperty(true);
     // Removed Previous index of the playlist & Last Play time
     // Solution 1, changed the Thread to the Timeline, where it will not block the
-    // download prograss*/
+    // download progress*/
 
     /*
      * private Thread progressUpdater;
@@ -37,11 +39,6 @@ public class AudioPlayerFX {
      */
     private Timeline proTimeline;
     private final Random random = new Random();
-    private int previousTrackIndex = -1;
-
-    public BooleanProperty isBooleanProperty() {
-        return isCycleMode;
-    }
 
     public void setIsCycleMode(boolean isCycle) {
         this.isCycleMode.set(isCycle);
@@ -56,17 +53,17 @@ public class AudioPlayerFX {
         }
     }
 
-    // Use mediaplayer to play. Changed the resumed to playing.
+    // Use mediaPlayer to play. Changed the resumed to playing.
     public void play(int index) {
-        if (historyList.isEmpty() || historyList.get(historyList.size() - 1) != index) {
+        if (historyList.isEmpty() || historyList.getLast() != index) {
             historyList.add(index);
         }
         currentTrackIndex = index;
-    
+
         if (mediaPlayer != null) {
             mediaPlayer.stop();
         }
-    
+
         try {
             String trackPath = "/songs/" + playlist.get(index);
             URL resource = getClass().getResource(trackPath);
@@ -118,38 +115,37 @@ public class AudioPlayerFX {
             if (playedIndices.size() >= playlist.size()) {
                 playedIndices.clear();
             }
-    
+
             int nextTrackIndex;
             do {
                 nextTrackIndex = random.nextInt(playlist.size());
             } while (playedIndices.contains(nextTrackIndex));
-            
+
             playedIndices.add(nextTrackIndex);
             currentTrackIndex = nextTrackIndex;
         }
-    
+
         play(currentTrackIndex);
+        App.updatePlayBarSongName(currentTrackIndex);
         return currentTrackIndex;
     }
-    
-    
-    
+
 
     // Play previous song, but not directly called by the Testing APFX3, called via
     // playUp()
     public int playPrevious() {
         if (historyList.size() > 1) {
-            historyList.remove(historyList.size() - 1);
-            currentTrackIndex = historyList.get(historyList.size() - 1);
+            historyList.removeLast();
+            currentTrackIndex = historyList.getLast();
         } else {
             System.out.println("No previous track available.");
             return currentTrackIndex;
         }
-    
+
         play(currentTrackIndex);
         return currentTrackIndex;
     }
-    
+
 
     // Use Media's duration seconds instead of clip.setMicrosecond from AP(1st
     // Generation)
@@ -172,39 +168,12 @@ public class AudioPlayerFX {
         return 0.0;
     }
 
-    // This progressUpdater would not be implement yet.
-    /*
-     * private void startProgressUpdater() {
-     * isRunning = true;
-     * progressUpdater = new Thread(new ProgressUpdater());
-     * progressUpdater.setDaemon(true);
-     * progressUpdater.start();
-     * }
-     * 
-     * private class ProgressUpdater implements Runnable {
-     * 
-     * @Override
-     * public void run() {
-     * while (isRunning && mediaPlayer != null) {
-     * double progress = getPlaybackProgress();
-     * Platform.runLater(() -> App.updatePlayProgress(progress));
-     * try {
-     * Thread.sleep(500);
-     * } catch (InterruptedException e) {
-     * e.printStackTrace();
-     * }
-     * }
-     * }
-     * }
-     */
-
-    // Timeline mehod of the progress updater:
-
+    // Timeline method of the progress updater:
     private void startProgressUpdater() {
         if (proTimeline != null) {
             proTimeline.stop();
         }
-        proTimeline = new Timeline(new KeyFrame(Duration.seconds(0.5), e -> {
+        proTimeline = new Timeline(new KeyFrame(Duration.seconds(0.5), _ -> {
             double progress = getPlaybackProgress();
             Platform.runLater(() -> App.updatePlayProgress(progress));
         }));
