@@ -56,22 +56,26 @@ public class App extends Application {
         primaryStage.show();
     }
 
-    //load constant content of the player
+    // load constant content of the player
     private void initContent() {
         Image prevIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/previous.png")));
-        Image hoverPrevIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/previousHover.png")));
+        Image hoverPrevIcon = new Image(
+                Objects.requireNonNull(getClass().getResourceAsStream("/icons/previousHover.png")));
         Image nextIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/next.png")));
         Image hoverNextIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/nextHover.png")));
 
         Image playIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/play.png")));
         Image hoverPlayIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/playHover.png")));
         Image pauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pause.png")));
-        Image hoverPauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pauseHover.png")));
+        Image hoverPauseIcon = new Image(
+                Objects.requireNonNull(getClass().getResourceAsStream("/icons/pauseHover.png")));
 
         Image cycleIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/cycle.png")));
-        Image hoverCycleIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/cycleHover.png")));
+        Image hoverCycleIcon = new Image(
+                Objects.requireNonNull(getClass().getResourceAsStream("/icons/cycleHover.png")));
         Image randomIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/random.png")));
-        Image hoverRandomIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/randomHover.png")));
+        Image hoverRandomIcon = new Image(
+                Objects.requireNonNull(getClass().getResourceAsStream("/icons/randomHover.png")));
 
         Button downloadPageButton = new Button("Download");
         Button playPageButton = new Button("Play");
@@ -176,7 +180,8 @@ public class App extends Application {
         Image hoverPlayIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/playHover.png")));
 
         Image downloadIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/download.png")));
-        Image hoverDownloadIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/downloadHover.png")));
+        Image hoverDownloadIcon = new Image(
+                Objects.requireNonNull(getClass().getResourceAsStream("/icons/downloadHover.png")));
 
         for (int i = 0; i < playlist.size(); i++) {
             HBox songRow = new HBox(5);
@@ -215,7 +220,8 @@ public class App extends Application {
 
     private void loadDownloadPage() {
         Image cancelIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/cancel.png")));
-        Image hoverCancelIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/cancelHover.png")));
+        Image hoverCancelIcon = new Image(
+                Objects.requireNonNull(getClass().getResourceAsStream("/icons/cancelHover.png")));
 
         for (int i = 1; i <= 4; i++) {
             HBox downloadRow = new HBox(5);
@@ -253,9 +259,9 @@ public class App extends Application {
     }
 
     // used when a song starts
-    public static void updatePlayBar(int index, Duration duration) {
+    public static void updatePlayBar(int index, Duration duration, String trackName) {
         // update song name on the play bar
-        currentSongName.setText(playlist.get(index));
+        currentSongName.setText(trackName);
         // display song duration
         formatTime(duration, songDuration);
     }

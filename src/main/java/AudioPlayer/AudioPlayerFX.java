@@ -19,16 +19,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
+import java.util.Collections;
 
 //This is the JavaFX edition of the AudioPlayer.
 public class AudioPlayerFX {
     private MediaPlayer mediaPlayer; // MediaPlayer object for songs.
     public List<String> playlist = new ArrayList<>(); // Arraylist playlist.
+    private List<String> shuffledPlaylist = new ArrayList<>();
     private final List<Integer> historyList = new ArrayList<>();
-    private final List<Integer> playedIndices = new ArrayList<>();
 
     private int currentTrackIndex = 0; // Current index of the playlist
     private final BooleanProperty isCycleMode = new SimpleBooleanProperty(true);
+
     // Removed Previous index of the playlist & Last Play time
     // Solution 1, changed the Thread to the Timeline, where it will not block the
     // download progress*/
@@ -41,10 +43,6 @@ public class AudioPlayerFX {
     private final Random random = new Random();
     Media media;
 
-    public void setIsCycleMode(boolean isCycle) {
-        this.isCycleMode.set(isCycle);
-    }
-
     // Initialize the Playlist. This time playlist is initialized at APFX3.java
     public AudioPlayerFX() {
         try (Stream<Path> files = Files.list(Paths.get("./src/main/resources/songs/"))) {
@@ -52,11 +50,31 @@ public class AudioPlayerFX {
         } catch (IOException e) {
             System.out.println("读取文件夹时出错: " + e.getMessage());
         }
+        shuffledPlaylist.addAll(playlist);
+    }
+
+    // Set the cycle mode.
+    public void setIsCycleMode(boolean isCycle) {
+        this.isCycleMode.set(isCycle);
+        if (!isCycle) {
+            shufflePlaylist();
+        } else {
+            restoreOriginalPlaylist();
+        }
+    }
+
+    private void shufflePlaylist() {
+        Collections.shuffle(shuffledPlaylist);
+    }
+
+    private void restoreOriginalPlaylist() {
+        shuffledPlaylist.clear();
+        shuffledPlaylist.addAll(playlist);
     }
 
     // Use mediaPlayer to play. Changed the resumed to playing.
     public void play(int index) {
-        if (historyList.isEmpty() || historyList.getLast() != index) {
+        if (historyList.isEmpty() || historyList.get(historyList.size() - 1) != index) {
             historyList.add(index);
         }
         currentTrackIndex = index;
@@ -66,7 +84,7 @@ public class AudioPlayerFX {
         }
 
         try {
-            String trackPath = "/songs/" + playlist.get(index);
+            String trackPath = "/songs/" + (isCycleMode.get() ? playlist.get(index) : shuffledPlaylist.get(index));
             URL resource = getClass().getResource(trackPath);
             if (resource != null) {
                 media = new Media(resource.toString());
@@ -76,7 +94,8 @@ public class AudioPlayerFX {
             } else {
                 System.err.println("Track not found: " + trackPath);
             }
-            mediaPlayer.setOnReady(() -> App.updatePlayBar(currentTrackIndex, media.getDuration()));
+            String trackName = isCycleMode.get() ? playlist.get(index) : shuffledPlaylist.get(index);
+            mediaPlayer.setOnReady(() -> App.updatePlayBar(currentTrackIndex, media.getDuration(), trackName));
             mediaPlayer.play();
             System.out.println("Playing: " + playlist.get(index));
         } catch (Exception e) {
@@ -104,7 +123,6 @@ public class AudioPlayerFX {
     public void stop() {
         if (mediaPlayer != null) {
             mediaPlayer.stop();
-            /* isRunning = false; */
             System.out.println("Stopped: " + playlist.get(currentTrackIndex));
         }
     }
@@ -114,24 +132,21 @@ public class AudioPlayerFX {
         if (isCycleMode.get()) {
             currentTrackIndex = (currentTrackIndex + 1) % playlist.size();
         } else {
-            if (playedIndices.size() >= playlist.size()) {
-                playedIndices.clear();
+            if (historyList.size() == shuffledPlaylist.size()) {
+                historyList.clear();
+                shufflePlaylist();
+            }
+            for (int i = 0; i < (shuffledPlaylist.size()); i++) {
+                if (!historyList.contains(i)) {
+                    play(i);
+                    return i;
+                }
             }
 
-            int nextTrackIndex;
-            do {
-                nextTrackIndex = random.nextInt(playlist.size());
-            } while (playedIndices.contains(nextTrackIndex));
-
-            playedIndices.add(nextTrackIndex);
-            currentTrackIndex = nextTrackIndex;
         }
-
         play(currentTrackIndex);
-        mediaPlayer.setOnReady(() -> App.updatePlayBar(currentTrackIndex, media.getDuration()));
         return currentTrackIndex;
     }
-
 
     // Play previous song, but not directly called by the Testing APFX3, called via
     // playUp()
@@ -146,16 +161,6 @@ public class AudioPlayerFX {
 
         play(currentTrackIndex);
         return currentTrackIndex;
-    }
-
-
-    // Use Media's duration seconds instead of clip.setMicrosecond from AP(1st
-    // Generation)
-    public void jumpToTime(double seconds) {
-        if (mediaPlayer != null) {
-            mediaPlayer.seek(Duration.seconds(seconds));
-            System.out.println("Jumped to: " + seconds + " seconds");
-        }
     }
 
     // Get the percentage of the playing status.
@@ -191,7 +196,18 @@ public class AudioPlayerFX {
         return playlist;
     }
 
+    // Use double progressinstead of clip.setMicrosecond from AP(1st
+    // Generation)
     public void jumpToProgress(double progress) {
-        
+        if (mediaPlayer != null && mediaPlayer.getTotalDuration() != null) {
+            Duration totalDuration = mediaPlayer.getTotalDuration();
+            double targetTimeInSeconds = totalDuration.toSeconds() * progress;
+
+            mediaPlayer.seek(Duration.seconds(targetTimeInSeconds));
+            System.out.println("Jumped to: " + (progress * 100) + "% of the track");
+        } else {
+            System.out.println("MediaPlayer or track duration is not available.");
+        }
     }
+
 }
