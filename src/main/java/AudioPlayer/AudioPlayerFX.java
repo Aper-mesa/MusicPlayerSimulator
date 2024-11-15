@@ -190,4 +190,8 @@ public class AudioPlayerFX {
     public List<String> getPlaylist() {
         return playlist;
     }
+
+    public void jumpToProgress(double progress) {
+        
+    }
 }

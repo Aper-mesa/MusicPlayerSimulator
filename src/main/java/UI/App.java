@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 public class App extends Application {
     final static int BUTTON_SIZE = 25;
+    final static int PROGRESS_WIDTH = 400;
     static ProgressBar progressBar = new ProgressBar(0.0);
     VBox playPage = new VBox();
     VBox downloadPage = new VBox();
@@ -34,7 +35,7 @@ public class App extends Application {
     Image hoverPauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pauseHover.png")));
     boolean isPlaying = false;
     boolean isCycle = true;
-    static Label currentTime = new Label("00: 00");
+    static Label currentTimeLabel = new Label("00: 00");
     static Label songDuration = new Label("00: 00");
 
     @Override
@@ -57,6 +58,21 @@ public class App extends Application {
 
     //load constant content of the player
     private void initContent() {
+        Image prevIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/previous.png")));
+        Image hoverPrevIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/previousHover.png")));
+        Image nextIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/next.png")));
+        Image hoverNextIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/nextHover.png")));
+
+        Image playIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/play.png")));
+        Image hoverPlayIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/playHover.png")));
+        Image pauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pause.png")));
+        Image hoverPauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pauseHover.png")));
+
+        Image cycleIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/cycle.png")));
+        Image hoverCycleIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/cycleHover.png")));
+        Image randomIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/random.png")));
+        Image hoverRandomIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/randomHover.png")));
+
         Button downloadPageButton = new Button("Download");
         Button playPageButton = new Button("Play");
 
@@ -81,21 +97,6 @@ public class App extends Application {
 
         currentSong.getChildren().add(currentSongName);
 
-        Image prevIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/previous.png")));
-        Image hoverPrevIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/previousHover.png")));
-        Image nextIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/next.png")));
-        Image hoverNextIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/nextHover.png")));
-
-        Image playIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/play.png")));
-        Image hoverPlayIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/playHover.png")));
-        Image pauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pause.png")));
-        Image hoverPauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pauseHover.png")));
-
-        Image cycleIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/cycle.png")));
-        Image hoverCycleIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/cycleHover.png")));
-        Image randomIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/random.png")));
-        Image hoverRandomIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/randomHover.png")));
-
         Button prevButton = getButton(prevIcon, hoverPrevIcon);
         playPauseButton = isPlaying ? getButton(pauseIcon, hoverPauseIcon) : getButton(playIcon, hoverPlayIcon);
         Button nextButton = getButton(nextIcon, hoverNextIcon);
@@ -108,9 +109,9 @@ public class App extends Application {
 
         controls.getChildren().addAll(spacer1, prevButton, playPauseButton, nextButton, modeButton, spacer2);
 
-        progressBar.setPrefWidth(400);
+        progressBar.setPrefWidth(PROGRESS_WIDTH);
         HBox progressBarContainer = new HBox(10);
-        progressBarContainer.getChildren().addAll(currentTime, progressBar, songDuration);
+        progressBarContainer.getChildren().addAll(currentTimeLabel, progressBar, songDuration);
 
         progressBarContainer.setAlignment(Pos.CENTER);
 
@@ -122,6 +123,16 @@ public class App extends Application {
 
         downloadPageButton.setOnAction(_ -> root.setCenter(downloadPage));
         playPageButton.setOnAction(_ -> root.setCenter(playPage));
+
+        progressBar.setOnMouseClicked(e -> {
+            double mouseX = e.getX();
+            double progressBarWidth = progressBar.getWidth();
+            double progress = mouseX / progressBarWidth;
+            progress = Math.max(0, Math.min(1, progress));
+
+            progressBar.setProgress(progress);
+            player.jumpToProgress(progress);
+        });
 
         playPauseButton.setOnAction(_ -> {
             if (isPlaying) {
@@ -249,16 +260,16 @@ public class App extends Application {
         formatTime(duration, songDuration);
     }
 
-    private static void formatTime(Duration duration, Label songDuration) {
+    private static void formatTime(Duration duration, Label label) {
         double totalSeconds = duration.toSeconds();
         long minutes = TimeUnit.SECONDS.toMinutes((long) totalSeconds);
         long seconds = (long) totalSeconds - TimeUnit.MINUTES.toSeconds(minutes);
-        String formattedDuration = String.format("%02d:%02d", minutes, seconds);
-        songDuration.setText(formattedDuration);
+        String formattedDuration = String.format("%02d: %02d", minutes, seconds);
+        label.setText(formattedDuration);
     }
 
     public static void updateCurrentTime(Duration duration) {
-        formatTime(duration, currentTime);
+        formatTime(duration, currentTimeLabel);
     }
 
     @NotNull
