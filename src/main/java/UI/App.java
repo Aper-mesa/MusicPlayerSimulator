@@ -12,10 +12,12 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 public class App extends Application {
     final static int BUTTON_SIZE = 25;
@@ -32,6 +34,7 @@ public class App extends Application {
     Image hoverPauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pauseHover.png")));
     boolean isPlaying = false;
     boolean isCycle = true;
+    static Label songDuration = new Label("00: 00");
 
     @Override
     public void start(Stage primaryStage) {
@@ -104,8 +107,12 @@ public class App extends Application {
 
         controls.getChildren().addAll(spacer1, prevButton, playPauseButton, nextButton, modeButton, spacer2);
 
+        Label currentTime = new Label("00: 00");
+
         progressBar.setPrefWidth(400);
-        HBox progressBarContainer = new HBox(progressBar);
+        HBox progressBarContainer = new HBox();
+        progressBarContainer.getChildren().addAll(currentTime, progressBar, songDuration);
+
         progressBarContainer.setAlignment(Pos.CENTER);
 
         playerBar.getChildren().addAll(currentSong, controls, progressBarContainer);
@@ -235,9 +242,16 @@ public class App extends Application {
         progressBar.setProgress(progress);
     }
 
-    // used when a song is finished
-    public static void updatePlayBarSongName(int index) {
+    // used when a song starts
+    public static void updatePlayBar(int index, Duration duration) {
+        // update song name on the play bar
         currentSongName.setText(playlist.get(index));
+        // display song duration
+        double totalSeconds = duration.toSeconds();
+        long minutes = TimeUnit.SECONDS.toMinutes((long) totalSeconds);
+        long seconds = (long) totalSeconds - TimeUnit.MINUTES.toSeconds(minutes);
+        String formattedDuration = String.format("%02d:%02d", minutes, seconds);
+        songDuration.setText(formattedDuration);
     }
 
     @NotNull

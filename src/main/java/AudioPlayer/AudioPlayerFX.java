@@ -39,6 +39,7 @@ public class AudioPlayerFX {
      */
     private Timeline proTimeline;
     private final Random random = new Random();
+    Media media;
 
     public void setIsCycleMode(boolean isCycle) {
         this.isCycleMode.set(isCycle);
@@ -68,13 +69,14 @@ public class AudioPlayerFX {
             String trackPath = "/songs/" + playlist.get(index);
             URL resource = getClass().getResource(trackPath);
             if (resource != null) {
-                Media media = new Media(resource.toString());
+                media = new Media(resource.toString());
                 mediaPlayer = new MediaPlayer(media);
                 startProgressUpdater();
                 mediaPlayer.setOnEndOfMedia(this::playNext);
             } else {
                 System.err.println("Track not found: " + trackPath);
             }
+            mediaPlayer.setOnReady(() -> App.updatePlayBar(currentTrackIndex, media.getDuration()));
             mediaPlayer.play();
             System.out.println("Playing: " + playlist.get(index));
         } catch (Exception e) {
@@ -126,7 +128,7 @@ public class AudioPlayerFX {
         }
 
         play(currentTrackIndex);
-        App.updatePlayBarSongName(currentTrackIndex);
+        mediaPlayer.setOnReady(() -> App.updatePlayBar(currentTrackIndex, media.getDuration()));
         return currentTrackIndex;
     }
 
