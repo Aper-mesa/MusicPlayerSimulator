@@ -108,7 +108,7 @@ public class AudioPlayerIII {
                 System.err.println("Track not found: " + trackPath);
             }
             String trackName = playingPlaylist.get(currentTrackIndex);
-            mediaPlayer.setOnReady(() -> App.updatePlayBar(currentTrackIndex, media.getDuration(), trackName));
+            mediaPlayer.setOnReady(() -> App.updatePlayBar(media.getDuration(), trackName));
             mediaPlayer.play();
             System.out.println("Playing: " + trackName);
         } catch (Exception e) {

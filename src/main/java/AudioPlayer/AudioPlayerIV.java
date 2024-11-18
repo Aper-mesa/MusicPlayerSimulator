@@ -4,8 +4,6 @@ import UI.App;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
@@ -15,11 +13,13 @@ import java.util.List;
 
 public class AudioPlayerIV {
     private MediaPlayer mediaPlayer;
-    private Playlist playlist;
+    private final Playlist playlist;
     private Timeline proTimeline;
     private Media media;
-    private BooleanProperty isCycle = new SimpleBooleanProperty(false);
     private int playbackMode = 0;
+    public static final int CYCLE = 0;
+    public static final int SHUFFLE = 1;
+    public static final int SINGLE = 2;
 
     public AudioPlayerIV() {
         playlist = new Playlist();
@@ -29,17 +29,20 @@ public class AudioPlayerIV {
         return playlist.getFilePlaylist();
     }
 
-    public BooleanProperty isCycleProperty() {
-        return isCycle;
-    }
-
-    public void setIsCycleMode(boolean isCycleMode) {
-        isCycle.set(isCycleMode);
-        playlist.setCycleMode(isCycleMode);
-    }
-
     public int getPlaybackMode() {
         return playbackMode;
+    }
+
+    public boolean isSingle() {
+        return playbackMode == SINGLE;
+    }
+
+    public boolean isShuffle() {
+        return playbackMode == SHUFFLE;
+    }
+
+    public boolean isCycle() {
+        return playbackMode == CYCLE;
     }
 
     public void setPlaybackMode(int mode) {
@@ -75,7 +78,7 @@ public class AudioPlayerIV {
                 System.err.println("Track not found: " + trackPath);
             }
             String trackName = playlist.getCurrentTrack();
-            mediaPlayer.setOnReady(() -> App.updatePlayBar(playlist.getCurrentTrackIndex(), media.getDuration(), trackName));
+            mediaPlayer.setOnReady(() -> App.updatePlayBar(media.getDuration(), trackName));
             mediaPlayer.play();
             System.out.println("Playing: " + trackName);
         } catch (Exception e) {
@@ -140,7 +143,7 @@ public class AudioPlayerIV {
         playlist.shufflePlaylist();
         String currentTrack = playlist.getFilePlaylist().get(currentIndex);
         playlist.getFilePlaylist().remove(currentIndex);
-        playlist.getFilePlaylist().add(0, currentTrack);
+        playlist.getFilePlaylist().addFirst(currentTrack);
         playlist.setCurrentTrackIndex(0);
         System.out.println("Shuffled playlist with current track as first.");
     }

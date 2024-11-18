@@ -1,6 +1,6 @@
 package UI;
 
-import AudioPlayer.AudioPlayerFX;
+import AudioPlayer.AudioPlayerIV;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -27,14 +27,13 @@ public class App extends Application {
     VBox downloadPage = new VBox();
     BorderPane root = new BorderPane();
     static List<String> playlist;
-    AudioPlayerFX player = new AudioPlayerFX();
+    AudioPlayerIV player = new AudioPlayerIV();
     static Label currentSongName = new Label();
     Button playPauseButton;
     Button modeButton;
     Image pauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pause.png")));
     Image hoverPauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pauseHover.png")));
     boolean isPlaying = false;
-    boolean isCycle = true;
     static Label currentTimeLabel = new Label("00: 00");
     static Label songDuration = new Label("00: 00");
 
@@ -73,9 +72,12 @@ public class App extends Application {
         Image cycleIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/cycle.png")));
         Image hoverCycleIcon = new Image(
                 Objects.requireNonNull(getClass().getResourceAsStream("/icons/cycleHover.png")));
-        Image randomIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/random.png")));
-        Image hoverRandomIcon = new Image(
-                Objects.requireNonNull(getClass().getResourceAsStream("/icons/randomHover.png")));
+        Image shuffleIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/shuffle.png")));
+        Image hoverShuffleIcon = new Image(
+                Objects.requireNonNull(getClass().getResourceAsStream("/icons/shuffleHover.png")));
+        Image singleIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/single.png")));
+        Image hoverSingleIcon = new Image(
+                Objects.requireNonNull(getClass().getResourceAsStream("/icons/singleHover.png")));
 
         Button downloadPageButton = new Button("Download");
         Button playPageButton = new Button("Play");
@@ -104,7 +106,8 @@ public class App extends Application {
         Button prevButton = getButton(prevIcon, hoverPrevIcon);
         playPauseButton = isPlaying ? getButton(pauseIcon, hoverPauseIcon) : getButton(playIcon, hoverPlayIcon);
         Button nextButton = getButton(nextIcon, hoverNextIcon);
-        modeButton = isCycle ? getButton(cycleIcon, hoverCycleIcon) : getButton(randomIcon, hoverRandomIcon);
+        player.setPlaybackMode(AudioPlayerIV.CYCLE);
+        modeButton = getButton(cycleIcon, hoverCycleIcon);
 
         Region spacer1 = new Region();
         Region spacer2 = new Region();
@@ -164,14 +167,16 @@ public class App extends Application {
         });
 
         modeButton.setOnAction(_ -> {
-            if (isCycle) {
-                isCycle = false;
-                modifyButton(randomIcon, hoverRandomIcon, modeButton);
-            } else {
-                isCycle = true;
+            if (player.isCycle()) {
+                player.setPlaybackMode(AudioPlayerIV.SINGLE);
+                modifyButton(singleIcon, hoverSingleIcon, modeButton);
+            } else if (player.isSingle()) {
+                player.setPlaybackMode(AudioPlayerIV.SHUFFLE);
+                modifyButton(shuffleIcon, hoverShuffleIcon, modeButton);
+            } else if (player.isShuffle()) {
+                player.setPlaybackMode(AudioPlayerIV.CYCLE);
                 modifyButton(cycleIcon, hoverCycleIcon, modeButton);
             }
-            player.setIsCycleMode(isCycle);
         });
     }
 
@@ -259,7 +264,7 @@ public class App extends Application {
     }
 
     // used when a song starts
-    public static void updatePlayBar(int index, Duration duration, String trackName) {
+    public static void updatePlayBar(Duration duration, String trackName) {
         // update song name on the play bar
         currentSongName.setText(trackName);
         // display song duration

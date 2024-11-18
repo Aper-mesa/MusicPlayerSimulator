@@ -95,7 +95,7 @@ public class AudioPlayerFX {
                 System.err.println("Track not found: " + trackPath);
             }
             String trackName = isCycleMode.get() ? playlist.get(index) : shuffledPlaylist.get(index);
-            mediaPlayer.setOnReady(() -> App.updatePlayBar(currentTrackIndex, media.getDuration(), trackName));
+            mediaPlayer.setOnReady(() -> App.updatePlayBar(media.getDuration(), trackName));
             mediaPlayer.play();
             System.out.println("Playing: " + playlist.get(index));
         } catch (Exception e) {
