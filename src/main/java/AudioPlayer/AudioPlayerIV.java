@@ -50,16 +50,20 @@ public class AudioPlayerIV {
             throw new IllegalArgumentException("Invalid playback mode. Use 0 (Sequential), 1 (Shuffled), or 2 (Single-track loop).");
         }
         this.playbackMode = mode;
-        if (playbackMode == 1) {
+        if (playbackMode == SHUFFLE) {
+            playlist.saveCurrentTrackIndex();
+            playlist.restorePlaylistOrder();
             shufflePlaylistStartingFromCurrent();
             System.out.println("Shuffled playback mode activated.");
-        } else if (playbackMode == 0) {
+        } else if (playbackMode == CYCLE) {
             playlist.restorePlaylistOrder();
             System.out.println("Sequential playback mode activated.");
-        } else {
+        } else if (playbackMode == SINGLE) {
+            playlist.switchToSingleTrackPlaylist();
             System.out.println("Single-track loop mode activated.");
         }
     }
+    
 
     public void play(int index) {
         playlist.setCurrentTrackIndex(index);
@@ -72,19 +76,23 @@ public class AudioPlayerIV {
             if (resource != null) {
                 media = new Media(resource.toString());
                 mediaPlayer = new MediaPlayer(media);
-                startProgressUpdater();
-                mediaPlayer.setOnEndOfMedia(this::playNext);
+                mediaPlayer.setOnReady(() -> {
+                    String trackName = playlist.getCurrentTrack();
+                    App.updatePlayBar(media.getDuration(), trackName);
+                    startProgressUpdater();
+                });
+    
+                mediaPlayer.play();
             } else {
                 System.err.println("Track not found: " + trackPath);
             }
-            String trackName = playlist.getCurrentTrack();
-            mediaPlayer.setOnReady(() -> App.updatePlayBar(media.getDuration(), trackName));
-            mediaPlayer.play();
-            System.out.println("Playing: " + trackName);
         } catch (Exception e) {
             System.err.println("Error loading track: " + e.getMessage());
         }
     }
+    
+    
+    
 
     public void resume() {
         if (mediaPlayer != null) {
@@ -108,6 +116,7 @@ public class AudioPlayerIV {
     }
 
     public int playNext() {
+        playlist.saveCurrentTrackIndex(); 
         playlist.nextTrack();
         play(playlist.getCurrentTrackIndex());
         return playlist.getCurrentTrackIndex();
@@ -117,14 +126,6 @@ public class AudioPlayerIV {
         playlist.previousTrack();
         play(playlist.getCurrentTrackIndex());
         return playlist.getCurrentTrackIndex();
-    }
-
-    private void onTrackEnd() {
-        if (playbackMode == 2) {
-            play(playlist.getCurrentTrackIndex());
-        } else {
-            playNext();
-        }
     }
 
     public double getPlaybackProgress() {
@@ -148,6 +149,10 @@ public class AudioPlayerIV {
         System.out.println("Shuffled playlist with current track as first.");
     }
 
+    public void restorePlaylistOrder() {
+        playlist.restorePlaylistOrder();
+    }
+
     public void reloadFilePlaylist() {
         playlist.reloadFilePlaylist();
     }
@@ -157,12 +162,22 @@ public class AudioPlayerIV {
             proTimeline.stop();
         }
         proTimeline = new Timeline(new KeyFrame(Duration.seconds(0.5), _ -> {
-            double progress = getPlaybackProgress();
-            Platform.runLater(() -> App.updatePlayProgress(progress));
+            if (mediaPlayer != null) {
+                Duration currentTime = mediaPlayer.getCurrentTime();
+                Duration totalDuration = mediaPlayer.getTotalDuration();
+                if (currentTime != null && totalDuration != null && totalDuration.greaterThan(Duration.ZERO)) {
+                    double progress = currentTime.toMillis() / totalDuration.toMillis();
+                    Platform.runLater(() -> {
+                        App.updatePlayProgress(progress);
+                        App.updateCurrentTime(currentTime);
+                    });
+                }
+            }
         }));
         proTimeline.setCycleCount(Timeline.INDEFINITE);
         proTimeline.play();
     }
+    
 
     public void jumpToProgress(double progress) {
         if (mediaPlayer != null && mediaPlayer.getTotalDuration() != null) {
@@ -170,4 +185,5 @@ public class AudioPlayerIV {
             mediaPlayer.seek(totalDuration.multiply(progress));
         }
     }
+
 }

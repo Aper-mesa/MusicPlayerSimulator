@@ -12,12 +12,14 @@ import java.util.stream.Stream;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+
 public class Playlist {
     private List<String> filePlaylist = new ArrayList<>();
     private ObservableList<String> playingPlaylist = FXCollections.observableArrayList();
 
     private List<String> playingHistory = new ArrayList<>();
     private int currentTrackIndex = 0;
+    private int savedCurrentTrackIndex = -1;
 
     public Playlist() {
         loadFilePlaylist();
@@ -71,11 +73,41 @@ public class Playlist {
         }
     }
 
+    public void saveCurrentTrackIndex() {
+        savedCurrentTrackIndex = currentTrackIndex;
+    }
+
+    public void switchToSingleTrackPlaylist() {
+        String currentTrack = getCurrentTrack();
+    
+        playingPlaylist.clear();
+        playingPlaylist.add(currentTrack);
+    
+        currentTrackIndex = 0;
+    }
+
     public void restorePlaylistOrder() {
         playingPlaylist.clear();
         playingPlaylist.addAll(filePlaylist);
-        currentTrackIndex = 0;
+    
+        currentTrackIndex = 1;
+    
+        if (savedCurrentTrackIndex >= 0 && savedCurrentTrackIndex < filePlaylist.size()) {
+            String currentTrackName = filePlaylist.get(savedCurrentTrackIndex);
+            currentTrackIndex = getTrackIndexByName(currentTrackName);
+        }
     }
+    
+    
+    private int getTrackIndexByName(String trackName) {
+        for (int i = 0; i < filePlaylist.size(); i++) {
+            if (filePlaylist.get(i).equals(trackName)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
 
     public void setCycleMode(boolean isCycleMode) {
         if (isCycleMode) {
