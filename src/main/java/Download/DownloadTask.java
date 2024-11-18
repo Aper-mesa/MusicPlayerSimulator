@@ -9,6 +9,7 @@ public class DownloadTask implements Runnable {
     private volatile boolean isCancelled = false; // 标记任务是否取消
     private ProgressCallback progressCallback; // 回调用于更新任务状态
     private final Object lock = new Object(); // 锁对象，用于线程间同步
+    private volatile String status = "Waiting"; // 默认状态
 
     // 构造函数
     public DownloadTask(String sourceFile, String destinationFile, ProgressCallback progressCallback) {

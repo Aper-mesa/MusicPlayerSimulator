@@ -5,6 +5,7 @@ import java.util.Map;
 
 public class DownloadManager {
     private ExecutorService executorService;
+
     private Map<String, DownloadTask> taskMap = new ConcurrentHashMap<>();
 
     public DownloadManager() {

@@ -24,7 +24,11 @@ public class Main {
         while (isRunning) {
             System.out.print("Enter command: ");
             command = scanner.nextLine();
-            String[] parts = command.split(" ");
+            // 正则表达式修复分割逻辑，支持带空格的路径
+            String[] parts = command.split(" (?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+            for (int i = 0; i < parts.length; i++) {
+                parts[i] = parts[i].replaceAll("^\"|\"$", ""); // 去掉引号
+            }
 
             if (parts.length == 0) {
                 System.out.println("Invalid command. Try again.");
