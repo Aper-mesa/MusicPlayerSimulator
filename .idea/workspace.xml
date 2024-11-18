@@ -5,13 +5,35 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="98d3255a-1d00-49c5-9850-296761bb8e99" name="Changes" comment="Add new Player with FX. Code later">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/AudioPlayer/AudioPlayerFX.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/AudioPlayer/AudioPlayerFX.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/AudioPlayer/AudioPlayerIII.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/AudioPlayer/AudioPlayerIII.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/AudioPlayer/AudioPlayerIV.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/AudioPlayer/AudioPlayerIV.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/UI/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/UI/App.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/icons/random.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/icons/shuffle.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/icons/randomHover.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/icons/shuffleHover.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/AudioPlayer/AudioPlayer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/AudioPlayer/AudioPlayerFX.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/AudioPlayer/AudioPlayerIII.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/AudioPlayer/AudioPlayerIV.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Download/ConsoleProgressCallback.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Download/DownloadManager.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Download/DownloadTask.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Download/Main.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Download/ProgressCallback.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/UI/App.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/UI/Player.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/edu/kean/musicplayersimulator/HelloApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/edu/kean/musicplayersimulator/HelloController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/edu/kean/musicplayersimulator/hello-view.fxml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/icons/download.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/icons/downloadHover.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/icons/next.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/icons/nextHover.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/icons/play.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/icons/playHover.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/icons/previous.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/icons/previousHover.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/icons/shuffle.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/icons/shuffleHover.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/icons/single.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/icons/singleHover.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/songs/Dissonant Harmony.wav" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/songs/Harmonious Dissonance.wav" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,7 +93,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "extract.method.default.visibility": "private",
-    "git-widget-placeholder": "new",
+    "git-widget-placeholder": "core",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "node.js.detected.package.eslint": "true",
