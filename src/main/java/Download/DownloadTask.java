@@ -1,61 +1,99 @@
 package Download;
 
 import java.io.*;
-//实现runnable接口
+
 public class DownloadTask implements Runnable {
-    private String sourceFile;//源文件路径
-    private String destinationFile;//目标文件路径
-    private volatile boolean isPaused = false;
-    private volatile boolean isCancelled = false;//控制下载过程
-    private ProgressCallback progressCallback;//下载进度
-//构造函数
+    private String sourceFile; // 源文件路径
+    private String destinationFile; // 目标文件路径
+    private volatile boolean isPaused = false; // 标记任务是否暂停
+    private volatile boolean isCancelled = false; // 标记任务是否取消
+    private ProgressCallback progressCallback; // 回调用于更新任务状态
+    private final Object lock = new Object(); // 锁对象，用于线程间同步
+
+    // 构造函数
     public DownloadTask(String sourceFile, String destinationFile, ProgressCallback progressCallback) {
         this.sourceFile = sourceFile;
         this.destinationFile = destinationFile;
         this.progressCallback = progressCallback;
     }
-//执行下载
+
     @Override
     public void run() {
+        File source = new File(sourceFile);
+        File destination = new File(destinationFile);
+
         try {
-            File source = new File(sourceFile);
-            File destination = new File(destinationFile);
-            long totalBytes = source.length();//源文件大小，计算下载进度用的
-            long bytesRead = 0;
-//从源文件读取数据并写入目标文件
+            // 检查源文件是否存在
+            if (!source.exists() || !source.isFile()) {
+                throw new FileNotFoundException("Source file does not exist: " + sourceFile);
+            }
+
+            // 检查目标目录是否存在，不存在则创建
+            if (!destination.getParentFile().exists() && !destination.getParentFile().mkdirs()) {
+                throw new IOException("Failed to create destination directory: " + destination.getParentFile().getAbsolutePath());
+            }
+
+            long totalBytes = source.length(); // 源文件大小
+            long bytesRead = 0; // 已复制字节数
+            long lastCallbackBytes = 0;
+
+            // 使用文件流进行文件复制
             try (InputStream in = new FileInputStream(source);
                  OutputStream out = new FileOutputStream(destination)) {
-                byte[] buffer = new byte[1024];//每次读取1kb
+                byte[] buffer = new byte[1024]; // 缓冲区
                 int bytes;
-                //控制下载过程的具体实现
                 while ((bytes = in.read(buffer)) != -1) {
-                    if (isCancelled) {
-                        break;
-                    }
-                    while (isPaused) {
-                        Thread.sleep(100); // Simulate pause by sleeping the thread
+                    synchronized (lock) {
+                        while (isPaused) {
+                            lock.wait(); // 如果暂停，等待被唤醒
+                        }
+                        if (isCancelled) {
+                            if (destination.exists() && !destination.delete()) {
+                                progressCallback.onError(new IOException("Failed to delete incomplete file"));
+                            }
+                            progressCallback.onCancelled();
+                            return;
+                        }
                     }
                     out.write(buffer, 0, bytes);
                     bytesRead += bytes;
-                    // Update progress through the callback
-                    double progress = (double) bytesRead / totalBytes;
-                    progressCallback.updateProgress(progress);
+
+                    // 更新进度（每 100KB 更新一次）
+                    if (bytesRead - lastCallbackBytes >= 1024 * 100) {
+                        progressCallback.updateProgress((double) bytesRead / totalBytes);
+                        lastCallbackBytes = bytesRead;
+                    }
                 }
+                progressCallback.updateProgress(1.0); // 确保完成时进度是 100%
+                progressCallback.onComplete(); // 通知任务完成
             }
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            if (e instanceof InterruptedException) {
+                Thread.currentThread().interrupt(); // 恢复中断状态
+            }
+            progressCallback.onError(e); // 通知任务出错
         }
     }
-//控制方法
+
+    // 暂停任务
     public void pause() {
-        isPaused = true;
+        synchronized (lock) {
+            isPaused = true;
+        }
     }
 
+    // 恢复任务
     public void resume() {
-        isPaused = false;
+        synchronized (lock) {
+            isPaused = false;
+            lock.notifyAll(); // 唤醒暂停的线程
+        }
     }
 
+    // 取消任务
     public void cancel() {
-        isCancelled = true;
+        synchronized (lock) {
+            isCancelled = true;
+        }
     }
 }
