@@ -11,7 +11,7 @@ import javafx.util.Duration;
 import java.net.URL;
 import java.util.List;
 
-public class AudioPlayerIV {
+public class AudioPlayer {
     private MediaPlayer mediaPlayer;
     private final Playlist playlist;
     private Timeline proTimeline;
@@ -21,7 +21,7 @@ public class AudioPlayerIV {
     public static final int SHUFFLE = 1;
     public static final int SINGLE = 2;
 
-    public AudioPlayerIV() {
+    public AudioPlayer() {
         playlist = new Playlist();
     }
 

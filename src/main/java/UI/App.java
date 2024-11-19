@@ -1,6 +1,6 @@
 package UI;
 
-import AudioPlayer.AudioPlayerIV;
+import AudioPlayer.AudioPlayer;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -27,7 +27,7 @@ public class App extends Application {
     VBox downloadPage = new VBox();
     BorderPane root = new BorderPane();
     static List<String> playlist;
-    AudioPlayerIV player = new AudioPlayerIV();
+    AudioPlayer player = new AudioPlayer();
     static Label currentSongName = new Label();
     Button playPauseButton;
     Button modeButton;
@@ -106,7 +106,7 @@ public class App extends Application {
         Button prevButton = getButton(prevIcon, hoverPrevIcon);
         playPauseButton = isPlaying ? getButton(pauseIcon, hoverPauseIcon) : getButton(playIcon, hoverPlayIcon);
         Button nextButton = getButton(nextIcon, hoverNextIcon);
-        player.setPlaybackMode(AudioPlayerIV.CYCLE);
+        player.setPlaybackMode(AudioPlayer.CYCLE);
         modeButton = getButton(cycleIcon, hoverCycleIcon);
 
         Region spacer1 = new Region();
@@ -168,13 +168,13 @@ public class App extends Application {
 
         modeButton.setOnAction(_ -> {
             if (player.isCycle()) {
-                player.setPlaybackMode(AudioPlayerIV.SINGLE);
+                player.setPlaybackMode(AudioPlayer.SINGLE);
                 modifyButton(singleIcon, hoverSingleIcon, modeButton);
             } else if (player.isSingle()) {
-                player.setPlaybackMode(AudioPlayerIV.SHUFFLE);
+                player.setPlaybackMode(AudioPlayer.SHUFFLE);
                 modifyButton(shuffleIcon, hoverShuffleIcon, modeButton);
             } else if (player.isShuffle()) {
-                player.setPlaybackMode(AudioPlayerIV.CYCLE);
+                player.setPlaybackMode(AudioPlayer.CYCLE);
                 modifyButton(cycleIcon, hoverCycleIcon, modeButton);
             }
         });
