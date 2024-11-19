@@ -271,6 +271,10 @@ public class App extends Application {
         formatTime(duration, songDuration);
     }
 
+    public static void updateDownloadProgress(double progress, int index) {
+
+    }
+
     private static void formatTime(Duration duration, Label label) {
         double totalSeconds = duration.toSeconds();
         long minutes = TimeUnit.SECONDS.toMinutes((long) totalSeconds);
