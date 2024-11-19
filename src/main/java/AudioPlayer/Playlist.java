@@ -56,22 +56,6 @@ public class Playlist {
         playingHistory.add(track);
     }
 
-    public void shufflePlaylist() {
-        if (playingPlaylist.size() > 1) {
-            List<String> shuffledList = new ArrayList<>(filePlaylist);
-            String currentTrack = playingPlaylist.get(currentTrackIndex);
-            shuffledList.remove(currentTrack);
-            shuffledList.add(0, currentTrack);
-            List<String> remainingTracks = shuffledList.subList(1, shuffledList.size());
-            Collections.shuffle(remainingTracks);
-
-            playingPlaylist.clear();
-            playingPlaylist.add(currentTrack);
-            playingPlaylist.addAll(remainingTracks);
-            currentTrackIndex = 0;
-        }
-    }
-
     public void saveCurrentTrackIndex() {
         savedCurrentTrackIndex = currentTrackIndex;
     }
@@ -117,14 +101,6 @@ public class Playlist {
         return -1;
     }
 
-    public void setCycleMode(boolean isCycleMode) {
-        if (isCycleMode) {
-            restorePlaylistOrder();
-        } else {
-            shufflePlaylist();
-        }
-    }
-
     public void nextTrack() {
         if (playingPlaylist.size() > 1) {
             currentTrackIndex = (currentTrackIndex + 1) % playingPlaylist.size();
@@ -141,6 +117,15 @@ public class Playlist {
 
     public String getCurrentTrack() {
         return playingPlaylist.get(currentTrackIndex);
+    }
+
+    public void updateCurrentTrackIndexByName(String trackName) {
+        int index = getTrackIndexByName(trackName);
+        if (index != -1) {
+            currentTrackIndex = index;
+        } else {
+            System.err.println("Track not found in the playlist: " + trackName);
+        }
     }
 
     public void selectTrackAndShuffle(int trackIndex) {

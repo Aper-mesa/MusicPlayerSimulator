@@ -46,18 +46,17 @@ public class AudioPlayer {
     }
 
     public void setPlaybackMode(int mode) {
-        if (mode < 0 || mode > 2) {
-            throw new IllegalArgumentException(
-                    "Invalid playback mode. Use 0 (Sequential), 1 (Shuffled), or 2 (Single-track loop).");
-        }
         this.playbackMode = mode;
         if (playbackMode == SHUFFLE) {
             playlist.saveCurrentTrackIndex();
+            int currentTrackIndex = playlist.getCurrentTrackIndex();
             playlist.restorePlaylistOrder();
-            shufflePlaylistStartingFromCurrent();
+            playlist.selectTrackAndShuffle(currentTrackIndex);
             System.out.println("Shuffled playback mode activated.");
         } else if (playbackMode == CYCLE) {
+            String currentTrack = playlist.getCurrentTrack();
             playlist.restorePlaylistOrder();
+            playlist.updateCurrentTrackIndexByName(currentTrack);
             System.out.println("Sequential playback mode activated.");
         } else if (playbackMode == SINGLE) {
             playlist.switchToSingleTrackPlaylist();
@@ -156,16 +155,6 @@ public class AudioPlayer {
             }
         }
         return 0.0;
-    }
-
-    private void shufflePlaylistStartingFromCurrent() {
-        int currentIndex = playlist.getCurrentTrackIndex();
-        playlist.shufflePlaylist();
-        String currentTrack = playlist.getFilePlaylist().get(currentIndex);
-        playlist.getFilePlaylist().remove(currentIndex);
-        playlist.getFilePlaylist().addFirst(currentTrack);
-        playlist.setCurrentTrackIndex(0);
-        System.out.println("Shuffled playlist with current track as first.");
     }
 
     public void restorePlaylistOrder() {
