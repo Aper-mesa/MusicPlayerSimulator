@@ -1,33 +1,84 @@
 package Download;
+//用来管理多个下载任务
 import java.util.concurrent.*;
-//这是下载管理器，用来管理多个并发下载任务的
-public class DownloadManager {
-    //创建线程池，允许最多五个下载任务
-    private ExecutorService executorService;
+import java.util.Map;
 
+public class DownloadManager {
+    private ExecutorService executorService;
+    private Map<String, DownloadTask> taskMap = new ConcurrentHashMap<>();
     public DownloadManager() {
         executorService = Executors.newFixedThreadPool(5); // 限制最多5个并发下载
     }
-//启动新的下载任务的
-    public void startDownload(String sourceFile, String destinationFile, ProgressCallback progressCallback) {
-        DownloadTask downloadTask = new DownloadTask(sourceFile, destinationFile, progressCallback);//创造下载任务
-        executorService.submit(downloadTask);//提交给线程池
+
+    public void startDownload(String taskId, String sourceFile, String destinationFile, ProgressCallback progressCallback) {
+        ProgressCallback wrappedCallback = new ProgressCallback() {
+            @Override
+            public void updateProgress(double progress) {
+                progressCallback.updateProgress(progress);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                progressCallback.onError(e);
+                taskMap.remove(taskId);
+            }
+
+            @Override
+            public void onCancelled() {
+                progressCallback.onCancelled();
+                taskMap.remove(taskId);
+            }
+
+            @Override
+            public void onComplete() {
+                progressCallback.onComplete();
+                taskMap.remove(taskId);
+            }
+        };
+
+        DownloadTask task = new DownloadTask(sourceFile, destinationFile, wrappedCallback);
+        taskMap.put(taskId, task);
+        executorService.submit(task);
     }
 
-    public void pauseDownload(DownloadTask downloadTask) {
-        downloadTask.pause();
+    public void pauseDownload(String taskId) {
+        synchronized (taskMap) {
+            DownloadTask task = taskMap.get(taskId);
+            if (task != null) task.pause();
+        }
     }
 
-    public void resumeDownload(DownloadTask downloadTask) {
-        downloadTask.resume();
+    public void resumeDownload(String taskId) {
+        synchronized (taskMap) {
+            DownloadTask task = taskMap.get(taskId);
+            if (task != null) task.resume();
+        }
     }
 
-    public void cancelDownload(DownloadTask downloadTask) {
-        downloadTask.cancel();
+    public void cancelDownload(String taskId) {
+        synchronized (taskMap) {
+            DownloadTask task = taskMap.get(taskId);
+            if (task != null) {
+                task.cancel();
+                taskMap.remove(taskId);
+            }
+        }
     }
-//关闭线程池————提交任务完成后再关闭
+
+    public void restartDownload(String taskId, String sourceFile, String destinationFile, ProgressCallback progressCallback) {
+        cancelDownload(taskId);
+        startDownload(taskId, sourceFile, destinationFile, progressCallback);
+    }
+
     public void shutdown() {
         executorService.shutdown();
+        try {
+            if (!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executorService.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 }
-

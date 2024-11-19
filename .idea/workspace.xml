@@ -84,7 +84,7 @@
       <recent name="C:\Users\Apermesa\IdeaProjects\MusicPlayerSimulator\src\main\java" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.App">
+  <component name="RunManager">
     <configuration name="App" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="UI.App" />
       <module name="MusicPlayerSimulator" />
