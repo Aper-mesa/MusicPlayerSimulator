@@ -73,28 +73,26 @@ public class AudioPlayer {
         try {
             String trackPath = "/songs/" + playlist.getCurrentTrack();
             URL resource = getClass().getResource(trackPath);
-           if r
-
-    esource != n
-    l
-            media = new Media(resource.toString());
-            mediaPlayer = new MediaPlayer(media);
+            if (resource != null) {
+                media = new Media(resource.toString());
+                mediaPlayer = new MediaPlayer(media);
                 mediaPlayer.setOnReady(() -> {
                     String trackName = playlist.getCurrentTrack();
                     App.updatePlayBar(media.getDuration(), trackName);
                     startProgressUpdater();
                 });
-            mediaPlayer.setOnEndOfMedia(() -> {
-                handleTrackEnd();
-            });
+                mediaPlayer.setOnEndOfMedia(() -> {
+                    handleTrackEnd();
+                });
 
                 mediaPlayer.play();
             } else {
                 System.err.println("Track not found: " + trackPath);
             }
-        }ch(xetion e)
-    
-    
+        } catch (Exception e) {
+            System.err.println("Error loading track: " + e.getMessage());
+        }
+    }
 
     public void playFromUI(int uiIndex) {
         if (uiIndex < 0 || uiIndex >= playlist.getFilePlaylist().size()) {
