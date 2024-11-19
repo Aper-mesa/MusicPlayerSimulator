@@ -12,7 +12,6 @@ import java.util.stream.Stream;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-
 public class Playlist {
     private List<String> filePlaylist = new ArrayList<>();
     private ObservableList<String> playingPlaylist = FXCollections.observableArrayList();
@@ -79,26 +78,36 @@ public class Playlist {
 
     public void switchToSingleTrackPlaylist() {
         String currentTrack = getCurrentTrack();
-    
+
         playingPlaylist.clear();
         playingPlaylist.add(currentTrack);
-    
+
         currentTrackIndex = 0;
+    }
+
+    public void switchToSingleTrackPlaylist(int trackIndex) {
+        if (trackIndex >= 0 && trackIndex < filePlaylist.size()) {
+            String selectedTrack = filePlaylist.get(trackIndex);
+            playingPlaylist.clear();
+            playingPlaylist.add(selectedTrack);
+            currentTrackIndex = 0;
+        } else {
+            System.err.println("Invalid track index for single-track mode: " + trackIndex);
+        }
     }
 
     public void restorePlaylistOrder() {
         playingPlaylist.clear();
         playingPlaylist.addAll(filePlaylist);
-    
+
         currentTrackIndex = 1;
-    
+
         if (savedCurrentTrackIndex >= 0 && savedCurrentTrackIndex < filePlaylist.size()) {
             String currentTrackName = filePlaylist.get(savedCurrentTrackIndex);
             currentTrackIndex = getTrackIndexByName(currentTrackName);
         }
     }
-    
-    
+
     private int getTrackIndexByName(String trackName) {
         for (int i = 0; i < filePlaylist.size(); i++) {
             if (filePlaylist.get(i).equals(trackName)) {
@@ -107,7 +116,6 @@ public class Playlist {
         }
         return -1;
     }
-    
 
     public void setCycleMode(boolean isCycleMode) {
         if (isCycleMode) {

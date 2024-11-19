@@ -47,7 +47,8 @@ public class AudioPlayer {
 
     public void setPlaybackMode(int mode) {
         if (mode < 0 || mode > 2) {
-            throw new IllegalArgumentException("Invalid playback mode. Use 0 (Sequential), 1 (Shuffled), or 2 (Single-track loop).");
+            throw new IllegalArgumentException(
+                    "Invalid playback mode. Use 0 (Sequential), 1 (Shuffled), or 2 (Single-track loop).");
         }
         this.playbackMode = mode;
         if (playbackMode == SHUFFLE) {
@@ -63,7 +64,6 @@ public class AudioPlayer {
             System.out.println("Single-track loop mode activated.");
         }
     }
-    
 
     public void play(int index) {
         playlist.setCurrentTrackIndex(index);
@@ -73,26 +73,47 @@ public class AudioPlayer {
         try {
             String trackPath = "/songs/" + playlist.getCurrentTrack();
             URL resource = getClass().getResource(trackPath);
-            if (resource != null) {
-                media = new Media(resource.toString());
-                mediaPlayer = new MediaPlayer(media);
+           if r
+
+    esource != n
+    l
+            media = new Media(resource.toString());
+            mediaPlayer = new MediaPlayer(media);
                 mediaPlayer.setOnReady(() -> {
                     String trackName = playlist.getCurrentTrack();
                     App.updatePlayBar(media.getDuration(), trackName);
                     startProgressUpdater();
                 });
-    
+            mediaPlayer.setOnEndOfMedia(() -> {
+                handleTrackEnd();
+            });
+
                 mediaPlayer.play();
             } else {
                 System.err.println("Track not found: " + trackPath);
             }
-        } catch (Exception e) {
-            System.err.println("Error loading track: " + e.getMessage());
+        }ch(xetion e)
+    
+    
+
+    public void playFromUI(int uiIndex) {
+        if (uiIndex < 0 || uiIndex >= playlist.getFilePlaylist().size()) {
+            System.err.println("Invalid index from UI: " + uiIndex);
+            return;
         }
+
+        if (isShuffle()) {
+            playlist.selectTrackAndShuffle(uiIndex);
+            System.out.println("Shuffle mode: Playing track " + playlist.getCurrentTrack());
+        } else if (isSingle()) {
+            playlist.switchToSingleTrackPlaylist(uiIndex);
+            System.out.println("Single mode: Playing track " + playlist.getCurrentTrack());
+        } else {
+            playlist.setCurrentTrackIndex(uiIndex);
+            System.out.println("Sequential mode: Playing track " + playlist.getCurrentTrack());
+        }
+        play(playlist.getCurrentTrackIndex());
     }
-    
-    
-    
 
     public void resume() {
         if (mediaPlayer != null) {
@@ -116,7 +137,7 @@ public class AudioPlayer {
     }
 
     public int playNext() {
-        playlist.saveCurrentTrackIndex(); 
+        playlist.saveCurrentTrackIndex();
         playlist.nextTrack();
         play(playlist.getCurrentTrackIndex());
         return playlist.getCurrentTrackIndex();
@@ -177,13 +198,16 @@ public class AudioPlayer {
         proTimeline.setCycleCount(Timeline.INDEFINITE);
         proTimeline.play();
     }
-    
 
     public void jumpToProgress(double progress) {
         if (mediaPlayer != null && mediaPlayer.getTotalDuration() != null) {
             Duration totalDuration = mediaPlayer.getTotalDuration();
             mediaPlayer.seek(totalDuration.multiply(progress));
         }
+    }
+
+    private void handleTrackEnd() {
+        playNext();
     }
 
 }
