@@ -1,29 +1,25 @@
 package Download;
 
-import javafx.scene.control.ProgressBar;
+import AudioPlayer.AudioPlayer;
+import UI.App;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DownloadManager {
     private final List<String> downloadList = new ArrayList<>(); // 下载列表
+    private final List<String> playlist;
 
     public DownloadManager() {
-        // 初始化五首歌的相对路径
-        downloadList.add("./src/main/resources/songs/song1.mp3");
-        downloadList.add("./src/main/resources/songs/song2.mp3");
-        downloadList.add("./src/main/resources/songs/song3.mp3");
-        downloadList.add("./src/main/resources/songs/song4.mp3");
-        downloadList.add("./src/main/resources/songs/song5.mp3");
+        AudioPlayer player = new AudioPlayer();
+        playlist = player.getPlaylist();
     }
 
-    /**
-     * 根据索引启动下载任务
-     *
-     * @param index Playlist 中的曲目索引
-     */
     public void startDownload(int index) {
-        if (index < 0 || index >= downloadList.size()) {
+        downloadList.add(playlist.get(index));
+
+        if (index >= downloadList.size()) {
             System.err.println("Invalid index: " + index);
             return;
         }
@@ -51,7 +47,7 @@ public class DownloadManager {
             @Override
             public void updateProgress(double progress) {
                 // 输出当前进度
-                System.out.printf("Downloading %s: %.2f%% complete%n", fileName, progress * 100);
+                App.updateDownloadProgress(progress, index);
             }
 
             @Override
@@ -75,5 +71,9 @@ public class DownloadManager {
         Thread thread = new Thread(task);
         thread.setDaemon(true);
         thread.start();
+    }
+
+    public List<String> getDownloadList() {
+        return downloadList;
     }
 }
