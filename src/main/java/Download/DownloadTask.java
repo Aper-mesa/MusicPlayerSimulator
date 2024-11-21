@@ -3,16 +3,14 @@ package Download;
 import java.io.*;
 
 public class DownloadTask implements Runnable {
-    private String sourceFile; // 源文件路径
-    private String destinationFile; // 目标文件路径
-    private volatile boolean isPaused = false; // 标记任务是否暂停
-    private volatile boolean isCancelled = false; // 标记任务是否取消
-    private ProgressCallback progressCallback; // 回调用于更新任务状态
-    private final Object lock = new Object(); // 锁对象，用于线程间同步
-    private volatile String status = "Waiting"; // 默认状态
+    private String sourceFile;
+    private String destinationFile;
+    private volatile boolean isPaused = false;
+    private volatile boolean isCancelled = false;
+    private ProgressCallback progressCallback;
+    private final Object lock = new Object();
+    private volatile String status = "Waiting";
 
-    
-    // 构造函数
     public DownloadTask(String sourceFile, String destinationFile, ProgressCallback progressCallback) {
         this.sourceFile = sourceFile;
         this.destinationFile = destinationFile;
@@ -25,31 +23,32 @@ public class DownloadTask implements Runnable {
         File destination = new File(destinationFile);
 
         try {
-            // 检查源文件是否存在
+            setStatus("Running");
+
             if (!source.exists() || !source.isFile()) {
                 throw new FileNotFoundException("Source file does not exist: " + sourceFile);
             }
 
-            // 检查目标目录是否存在，不存在则创建
             if (!destination.getParentFile().exists() && !destination.getParentFile().mkdirs()) {
                 throw new IOException("Failed to create destination directory: " + destination.getParentFile().getAbsolutePath());
             }
 
-            long totalBytes = source.length(); // 源文件大小
-            long bytesRead = 0; // 已复制字节数
+            long totalBytes = source.length();
+            long bytesRead = 0;
             long lastCallbackBytes = 0;
 
-            // 使用文件流进行文件复制
             try (InputStream in = new FileInputStream(source);
                  OutputStream out = new FileOutputStream(destination)) {
-                byte[] buffer = new byte[1024]; // 缓冲区
+                byte[] buffer = new byte[1024];
                 int bytes;
                 while ((bytes = in.read(buffer)) != -1) {
                     synchronized (lock) {
                         while (isPaused) {
-                            lock.wait(); // 如果暂停，等待被唤醒
+                            setStatus("Paused");
+                            lock.wait();
                         }
                         if (isCancelled) {
+                            setStatus("Cancelled");
                             if (destination.exists() && !destination.delete()) {
                                 progressCallback.onError(new IOException("Failed to delete incomplete file"));
                             }
@@ -60,42 +59,52 @@ public class DownloadTask implements Runnable {
                     out.write(buffer, 0, bytes);
                     bytesRead += bytes;
 
-                    // 更新进度（每 100KB 更新一次）
                     if (bytesRead - lastCallbackBytes >= 1024 * 100) {
                         progressCallback.updateProgress((double) bytesRead / totalBytes);
                         lastCallbackBytes = bytesRead;
                     }
                 }
-                progressCallback.updateProgress(1.0); // 确保完成时进度是 100%
-                progressCallback.onComplete(); // 通知任务完成
+                progressCallback.updateProgress(1.0);
+                setStatus("Completed");
+                progressCallback.onComplete();
             }
         } catch (IOException | InterruptedException e) {
+            setStatus("Error");
             if (e instanceof InterruptedException) {
-                Thread.currentThread().interrupt(); // 恢复中断状态
+                Thread.currentThread().interrupt();
             }
-            progressCallback.onError(e); // 通知任务出错
+            progressCallback.onError(e);
         }
     }
 
-    // 暂停任务
     public void pause() {
         synchronized (lock) {
             isPaused = true;
         }
     }
 
-    // 恢复任务
     public void resume() {
         synchronized (lock) {
             isPaused = false;
-            lock.notifyAll(); // 唤醒暂停的线程
+            lock.notifyAll();
+            setStatus("Running");
         }
     }
 
-    // 取消任务
     public void cancel() {
         synchronized (lock) {
             isCancelled = true;
+            setStatus("Cancelled");
+        }
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    private void setStatus(String newStatus) {
+        synchronized (lock) {
+            status = newStatus;
         }
     }
 }

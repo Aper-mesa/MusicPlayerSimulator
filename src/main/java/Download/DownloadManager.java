@@ -1,84 +1,79 @@
 package Download;
-//用来管理多个下载任务
-import java.util.concurrent.*;
-import java.util.Map;
+
+import javafx.scene.control.ProgressBar;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DownloadManager {
-    private ExecutorService executorService;
-    private Map<String, DownloadTask> taskMap = new ConcurrentHashMap<>();
+    private final List<String> downloadList = new ArrayList<>(); // 下载列表
+
     public DownloadManager() {
-        executorService = Executors.newFixedThreadPool(5); // 限制最多5个并发下载
+        // 初始化五首歌的相对路径
+        downloadList.add("./src/main/resources/songs/song1.mp3");
+        downloadList.add("./src/main/resources/songs/song2.mp3");
+        downloadList.add("./src/main/resources/songs/song3.mp3");
+        downloadList.add("./src/main/resources/songs/song4.mp3");
+        downloadList.add("./src/main/resources/songs/song5.mp3");
     }
 
-    public void startDownload(String taskId, String sourceFile, String destinationFile, ProgressCallback progressCallback) {
-        ProgressCallback wrappedCallback = new ProgressCallback() {
+    /**
+     * 根据索引启动下载任务
+     *
+     * @param index Playlist 中的曲目索引
+     */
+    public void startDownload(int index) {
+        if (index < 0 || index >= downloadList.size()) {
+            System.err.println("Invalid index: " + index);
+            return;
+        }
+
+        // 获取源文件路径
+        String sourcePath = downloadList.get(index);
+
+        // 获取目标文件夹路径
+        String userHome = System.getProperty("user.home");
+        String destinationFolder = userHome + "/Downloads/MusicPlayerDownloads";
+
+        // 获取文件名并生成目标路径
+        String fileName = new File(sourcePath).getName();
+        String destinationPath = new File(destinationFolder, fileName).getAbsolutePath();
+
+        // 创建目标文件夹（如果不存在）
+        File destinationDir = new File(destinationFolder);
+        if (!destinationDir.exists() && !destinationDir.mkdirs()) {
+            System.err.println("Failed to create directory: " + destinationFolder);
+            return;
+        }
+
+        // 创建 ProgressCallback
+        ProgressCallback callback = new ProgressCallback() {
             @Override
             public void updateProgress(double progress) {
-                progressCallback.updateProgress(progress);
+                // 输出当前进度
+                System.out.printf("Downloading %s: %.2f%% complete%n", fileName, progress * 100);
             }
 
             @Override
             public void onError(Exception e) {
-                progressCallback.onError(e);
-                taskMap.remove(taskId);
+                System.err.println("Error downloading " + fileName + ": " + e.getMessage());
             }
 
             @Override
             public void onCancelled() {
-                progressCallback.onCancelled();
-                taskMap.remove(taskId);
+                System.out.println("Download cancelled: " + fileName);
             }
 
             @Override
             public void onComplete() {
-                progressCallback.onComplete();
-                taskMap.remove(taskId);
+                System.out.println("Download completed: " + destinationPath);
             }
         };
 
-        DownloadTask task = new DownloadTask(sourceFile, destinationFile, wrappedCallback);
-        taskMap.put(taskId, task);
-        executorService.submit(task);
-    }
-
-    public void pauseDownload(String taskId) {
-        synchronized (taskMap) {
-            DownloadTask task = taskMap.get(taskId);
-            if (task != null) task.pause();
-        }
-    }
-
-    public void resumeDownload(String taskId) {
-        synchronized (taskMap) {
-            DownloadTask task = taskMap.get(taskId);
-            if (task != null) task.resume();
-        }
-    }
-
-    public void cancelDownload(String taskId) {
-        synchronized (taskMap) {
-            DownloadTask task = taskMap.get(taskId);
-            if (task != null) {
-                task.cancel();
-                taskMap.remove(taskId);
-            }
-        }
-    }
-
-    public void restartDownload(String taskId, String sourceFile, String destinationFile, ProgressCallback progressCallback) {
-        cancelDownload(taskId);
-        startDownload(taskId, sourceFile, destinationFile, progressCallback);
-    }
-
-    public void shutdown() {
-        executorService.shutdown();
-        try {
-            if (!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
-                executorService.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            executorService.shutdownNow();
-            Thread.currentThread().interrupt();
-        }
+        // 创建并启动 DownloadTask
+        DownloadTask task = new DownloadTask(sourcePath, destinationPath, callback);
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
     }
 }
