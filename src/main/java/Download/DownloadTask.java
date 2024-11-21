@@ -11,6 +11,7 @@ public class DownloadTask implements Runnable {
     private final Object lock = new Object(); // 锁对象，用于线程间同步
     private volatile String status = "Waiting"; // 默认状态
 
+    
     // 构造函数
     public DownloadTask(String sourceFile, String destinationFile, ProgressCallback progressCallback) {
         this.sourceFile = sourceFile;
