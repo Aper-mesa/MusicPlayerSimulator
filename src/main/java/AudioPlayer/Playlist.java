@@ -28,7 +28,10 @@ public class Playlist {
     private void loadFilePlaylist() {
         filePlaylist.clear();
         try (Stream<Path> files = Files.list(Paths.get("./src/main/resources/songs/"))) {
-            files.filter(Files::isRegularFile).forEach(file -> filePlaylist.add(file.getFileName().toString()));
+            files.filter(Files::isRegularFile)
+                    .map(file -> file.getFileName().toString())
+                    .sorted()
+                    .forEach(filePlaylist::add);
         } catch (IOException e) {
             System.out.println("Error reading the songs directory: " + e.getMessage());
         }
