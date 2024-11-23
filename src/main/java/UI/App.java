@@ -1,6 +1,7 @@
 package UI;
 
 import AudioPlayer.AudioPlayer;
+import Download.DownloadManager;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -15,27 +16,33 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class App extends Application {
-    final static int BUTTON_SIZE = 25;
-    final static int PROGRESS_WIDTH = 400;
-    static ProgressBar progressBar = new ProgressBar(0.0);
-    VBox playPage = new VBox();
-    VBox downloadPage = new VBox();
-    BorderPane root = new BorderPane();
-    static List<String> playlist;
-    AudioPlayer player = new AudioPlayer();
-    static Label currentSongName = new Label();
-    Button playPauseButton;
-    Button modeButton;
-    Image pauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pause.png")));
-    Image hoverPauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pauseHover.png")));
-    boolean isPlaying = false;
-    static Label currentTimeLabel = new Label("00: 00");
-    static Label songDuration = new Label("00: 00");
+    private final static int BUTTON_SIZE = 25;
+    private final static int PROGRESS_WIDTH = 400;
+    private static final ProgressBar progressBar = new ProgressBar(0.0);
+    private final VBox playPage = new VBox();
+    private static final VBox downloadPage = new VBox();
+    private final BorderPane root = new BorderPane();
+    private static List<String> playlist;
+    private final AudioPlayer player = new AudioPlayer();
+    private final DownloadManager dm = new DownloadManager();
+    private static final Label currentSongName = new Label();
+    private Button playPauseButton;
+    private Button modeButton;
+    private static final Image pauseIcon = new Image(Objects.requireNonNull(App.class.getResourceAsStream("/icons/pause.png")));
+    private static final Image hoverPauseIcon = new Image(Objects.requireNonNull(App.class.getResourceAsStream("/icons/pauseHover.png")));
+    private static final Image cancelIcon = new Image(Objects.requireNonNull(App.class.getResourceAsStream("/icons/cancel.png")));
+    private static final Image hoverCancelIcon = new Image(
+            Objects.requireNonNull(App.class.getResourceAsStream("/icons/cancelHover.png")));
+    private boolean isPlaying = false;
+    private static final Label currentTimeLabel = new Label("00: 00");
+    private static final Label songDuration = new Label("00: 00");
+    private static final List<HBox> downloadRows = new ArrayList<>();
 
     @Override
     public void start(Stage primaryStage) {
@@ -47,9 +54,8 @@ public class App extends Application {
         initContent();
 
         loadPlayPage();
-        loadDownloadPage();
 
-        Scene scene = new Scene(root, 650, 600);
+        Scene scene = new Scene(root, 800, 600);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
@@ -216,47 +222,58 @@ public class App extends Application {
             int finalI = i;
             playButton.setOnAction(_ -> {
                 isPlaying = true;
-                player.play(finalI);
+                player.playFromUI(finalI);
                 currentSongName.setText(songName.getText());
                 modifyButton(pauseIcon, hoverPauseIcon, playPauseButton);
             });
+
+            // create a download task
+            downloadButton.setOnAction(_ -> {
+                        // TODO temporary, used to rapidly switch to download page to see.
+                        //TODO  will remove after slow download speed
+                        root.setCenter(downloadPage);
+                        dm.startDownload(finalI);
+                    }
+            );
         }
     }
 
-    private void loadDownloadPage() {
-        Image cancelIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/cancel.png")));
-        Image hoverCancelIcon = new Image(
-                Objects.requireNonNull(getClass().getResourceAsStream("/icons/cancelHover.png")));
+    //create a new download row in the download page
+    public static void addDownloadRow(int index, int downloadIndex) {
+        HBox downloadRow = new HBox(5);
+        downloadRows.add(downloadRow);
+        downloadRow.setPrefHeight(50);
+        downloadRow.setAlignment(Pos.CENTER_LEFT);
 
-        for (int i = 1; i <= 4; i++) {
-            HBox downloadRow = new HBox(5);
-            downloadRow.setPrefHeight(50);
-            downloadRow.setAlignment(Pos.CENTER_LEFT);
+        Label downloadNumber = new Label("   " + (downloadIndex + 1));
+        downloadNumber.setPrefWidth(50);
+        downloadNumber.setStyle("-fx-font-size: 16px;");
 
-            Label downloadNumber = new Label("   " + i);
-            downloadNumber.setPrefWidth(50);
-            downloadNumber.setStyle("-fx-font-size: 16px;");
+        Label songName = new Label(playlist.get(index));
+        songName.setStyle("-fx-font-size: 16px;");
 
-            Label songName = new Label("Song " + i);
-            songName.setPrefWidth(100);
-            songName.setStyle("-fx-font-size: 16px;");
+        Region spacer = new Region();
+        spacer.setMinWidth(Region.USE_COMPUTED_SIZE);
+        HBox.setHgrow(spacer, Priority.ALWAYS);
 
-            Region spacer = new Region();
-            spacer.setMinWidth(Region.USE_COMPUTED_SIZE);
-            HBox.setHgrow(spacer, Priority.ALWAYS);
+        ProgressBar progressBar = new ProgressBar(0.0);
+        progressBar.setPrefWidth(200);
 
-            ProgressBar progressBar = new ProgressBar(0.0);
-            progressBar.setPrefWidth(200);
+        Button pauseButton = getButton(pauseIcon, hoverPauseIcon);
+        Button cancelButton = getButton(cancelIcon, hoverCancelIcon);
 
-            Button pauseButton = getButton(pauseIcon, hoverPauseIcon);
-            Button cancelButton = getButton(cancelIcon, hoverCancelIcon);
+        downloadRow.getChildren().addAll(downloadNumber, songName, spacer, progressBar, pauseButton, cancelButton);
+        downloadPage.getChildren().add(downloadRow);
 
-            downloadRow.getChildren().addAll(downloadNumber, songName, spacer, progressBar, pauseButton, cancelButton);
-            downloadPage.getChildren().add(downloadRow);
+        downloadRow.setOnMouseEntered(_ -> downloadRow.setStyle("-fx-background-color: #ececec;"));
+        downloadRow.setOnMouseExited(_ -> downloadRow.setStyle("-fx-background-color: transparent;"));
+    }
 
-            downloadRow.setOnMouseEntered(_ -> downloadRow.setStyle("-fx-background-color: #ececec;"));
-            downloadRow.setOnMouseExited(_ -> downloadRow.setStyle("-fx-background-color: transparent;"));
-        }
+    public static void removeDownloadTask(int index) {
+        System.out.println("remove download row with index " + index);
+        downloadRows.get(index).getChildren().clear();
+        downloadPage.getChildren().remove(downloadRows.get(index));
+        downloadRows.remove(index);
     }
 
     public static void updatePlayProgress(double progress) {
@@ -272,7 +289,7 @@ public class App extends Application {
     }
 
     public static void updateDownloadProgress(double progress, int index) {
-
+        ((ProgressBar) downloadRows.get(index).getChildren().get(3)).setProgress(progress);
     }
 
     private static void formatTime(Duration duration, Label label) {

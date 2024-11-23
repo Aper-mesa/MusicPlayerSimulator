@@ -3,11 +3,11 @@ package Download;
 import java.io.*;
 
 public class DownloadTask implements Runnable {
-    private String sourceFile;
-    private String destinationFile;
+    private final String sourceFile;
+    private final String destinationFile;
     private volatile boolean isPaused = false;
     private volatile boolean isCancelled = false;
-    private ProgressCallback progressCallback;
+    private final ProgressCallback progressCallback;
     private final Object lock = new Object();
     private volatile String status = "Waiting";
 
