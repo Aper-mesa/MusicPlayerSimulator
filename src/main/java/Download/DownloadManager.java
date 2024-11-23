@@ -85,4 +85,14 @@ public class DownloadManager {
     public List<DownloadTask> getTaskList() {
         return taskList;
     }
+    public List<String> getDownloadList() {
+        List<String> downloadList = new ArrayList<>();
+        for (int i = 0; i < taskList.size(); i++) {
+            if (taskList.get(i) != null) { // 如果任务存在
+                downloadList.add(playlist.get(i)); // 从 playlist 获取文件路径
+            }
+        }
+        return downloadList;
+    }
+
 }
