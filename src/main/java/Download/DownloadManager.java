@@ -7,6 +7,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class DownloadManager {
     private final List<String> playlist; // 播放列表
     private final List<DownloadTask> taskList = new ArrayList<>(); // 下载任务列表
