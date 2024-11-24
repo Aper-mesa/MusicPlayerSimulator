@@ -15,6 +15,20 @@ public class DownloadManager {
         AudioPlayer player = new AudioPlayer();
         playlist = player.getPlaylist();
     }
+    public void removeTask(int index) {
+        if (index < 0 || index >= taskList.size()) {
+            System.err.println("Invalid index: " + index);
+            return;
+        }
+
+        String task = taskList.get(index);
+        if (task != null) {
+            taskList.remove(task); // 从任务列表中移除
+            App.removeDownloadTask(index); // 更新 UI
+            System.out.println("Task at index " + index + " has been removed.");
+        }
+    }
+
 
     public void startDownload(int index) {
         taskList.add(playlist.get(index));
@@ -72,10 +86,12 @@ public class DownloadManager {
             @Override
             public void onComplete() {
                 System.out.println("Download completed: " + destinationPath);
-                // TODO this line will cause error, fix it!
-                //App.removeDownloadTask(taskList.indexOf(playlist.get(index)));
-                taskList.remove(playlist.get(index));
+                int taskIndex = taskList.indexOf(playlist.get(index));
+                if (taskIndex != -1) {
+                    removeTask(taskIndex); // 调用移除方法
+                }
             }
+
         };
 
         // 创建并启动 DownloadTask
@@ -84,4 +100,5 @@ public class DownloadManager {
         thread.setDaemon(true);
         thread.start();
     }
+
 }

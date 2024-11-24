@@ -3,30 +3,28 @@ package Download;
 import java.io.*;
 
 public class DownloadTask implements Runnable {
-    private final String sourceFile;
-    private final String destinationFile;
-    private volatile boolean isPaused = false;
-    private volatile boolean isCancelled = false;
-    private final ProgressCallback progressCallback;
-    private final Object lock = new Object();
-    private volatile String status = "Waiting";
+    private final String sourcePath; // 源文件路径
+    private final String destinationPath; // 目标文件路径
+    private volatile boolean isPaused = false; // 是否暂停
+    private volatile boolean isCancelled = false; // 是否取消
+    private final ProgressCallback progressCallback; // 进度回调接口
+    private final Object lock = new Object(); // 用于暂停和取消的锁
+    private volatile long speed = 1024 * 100; // 下载速度（字节/秒），默认 100 KB/s
 
-    public DownloadTask(String sourceFile, String destinationFile, ProgressCallback progressCallback) {
-        this.sourceFile = sourceFile;
-        this.destinationFile = destinationFile;
+    public DownloadTask(String sourcePath, String destinationPath, ProgressCallback progressCallback) {
+        this.sourcePath = sourcePath;
+        this.destinationPath = destinationPath;
         this.progressCallback = progressCallback;
     }
 
     @Override
     public void run() {
-        File source = new File(sourceFile);
-        File destination = new File(destinationFile);
+        File source = new File(sourcePath);
+        File destination = new File(destinationPath);
 
         try {
-            setStatus("Running");
-
             if (!source.exists() || !source.isFile()) {
-                throw new FileNotFoundException("Source file does not exist: " + sourceFile);
+                throw new FileNotFoundException("Source file does not exist: " + sourcePath);
             }
 
             if (!destination.getParentFile().exists() && !destination.getParentFile().mkdirs()) {
@@ -35,20 +33,20 @@ public class DownloadTask implements Runnable {
 
             long totalBytes = source.length();
             long bytesRead = 0;
-            long lastCallbackBytes = 0;
+            long lastTime = System.currentTimeMillis();
+            long bytesDownloadedThisSecond = 0;
 
             try (InputStream in = new FileInputStream(source);
                  OutputStream out = new FileOutputStream(destination)) {
                 byte[] buffer = new byte[1024];
                 int bytes;
+
                 while ((bytes = in.read(buffer)) != -1) {
                     synchronized (lock) {
                         while (isPaused) {
-                            setStatus("Paused");
                             lock.wait();
                         }
                         if (isCancelled) {
-                            setStatus("Cancelled");
                             if (destination.exists() && !destination.delete()) {
                                 progressCallback.onError(new IOException("Failed to delete incomplete file"));
                             }
@@ -56,55 +54,66 @@ public class DownloadTask implements Runnable {
                             return;
                         }
                     }
+
                     out.write(buffer, 0, bytes);
                     bytesRead += bytes;
+                    bytesDownloadedThisSecond += bytes;
 
-                    if (bytesRead - lastCallbackBytes >= 1024 * 100) {
-                        progressCallback.updateProgress((double) bytesRead / totalBytes);
-                        lastCallbackBytes = bytesRead;
+                    progressCallback.updateProgress((double) bytesRead / totalBytes);
+
+                    // 控制下载速度
+                    long currentTime = System.currentTimeMillis();
+                    if (bytesDownloadedThisSecond >= speed) {
+                        long timeElapsed = currentTime - lastTime;
+                        if (timeElapsed < 1000) {
+                            Thread.sleep(1000 - timeElapsed);
+                        }
+                        lastTime = System.currentTimeMillis();
+                        bytesDownloadedThisSecond = 0;
                     }
                 }
+
                 progressCallback.updateProgress(1.0);
-                setStatus("Completed");
                 progressCallback.onComplete();
             }
         } catch (IOException | InterruptedException e) {
-            setStatus("Error");
+            progressCallback.onError(e);
             if (e instanceof InterruptedException) {
                 Thread.currentThread().interrupt();
             }
-            progressCallback.onError(e);
         }
     }
 
+    // 暂停任务
     public void pause() {
         synchronized (lock) {
             isPaused = true;
         }
     }
 
+    // 恢复任务
     public void resume() {
         synchronized (lock) {
             isPaused = false;
             lock.notifyAll();
-            setStatus("Running");
         }
     }
 
+    // 取消任务
     public void cancel() {
         synchronized (lock) {
             isCancelled = true;
-            setStatus("Cancelled");
+            lock.notifyAll();
         }
     }
 
-    public String getStatus() {
-        return status;
+    // 设置下载速度
+    public void setSpeed(long speed) {
+        this.speed = speed;
     }
 
-    private void setStatus(String newStatus) {
-        synchronized (lock) {
-            status = newStatus;
-        }
+    // 获取当前速度
+    public long getSpeed() {
+        return speed;
     }
 }
