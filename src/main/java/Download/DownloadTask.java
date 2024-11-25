@@ -7,16 +7,19 @@ public class DownloadTask implements Runnable {
     private final String destinationPath; // 目标文件路径
     private volatile boolean isPaused = false; // 是否暂停
     private volatile boolean isCancelled = false; // 是否取消
-    private final ProgressCallback progressCallback; // 进度回调接口
+    private ProgressCallback progressCallback; // 进度回调接口
     private final Object lock = new Object(); // 用于暂停和取消的锁
-    private volatile long speed = 1024 * 100; // 下载速度（字节/秒），默认 100 KB/s
+    private volatile long speed = 1024 * 50; // 下载速度（字节/秒），这里可以限制下载速度大小
 
     public DownloadTask(String sourcePath, String destinationPath, ProgressCallback progressCallback) {
         this.sourcePath = sourcePath;
         this.destinationPath = destinationPath;
         this.progressCallback = progressCallback;
     }
-
+    //用于设置动态回调
+    public void setProgressCallback(ProgressCallback progressCallback) {
+        this.progressCallback = progressCallback;
+    }
     @Override
     public void run() {
         File source = new File(sourcePath);
