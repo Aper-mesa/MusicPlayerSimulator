@@ -12,6 +12,7 @@ public class DownloadManager {
     private final List<String> playlist; // 播放列表
     private final List<DownloadTask> taskList = new ArrayList<>(); // 下载任务列表
     private final List<String> downloadedFiles = new ArrayList<>();//已完成下载的集合
+    private final List<String> startedFiles = new ArrayList<>();//已开始下载的集合
 
     public DownloadManager() {
         AudioPlayer player = new AudioPlayer();
@@ -23,6 +24,17 @@ public class DownloadManager {
         String sourcePath = "./src/main/resources/songs/" + playlist.get(index);
         String userHome = System.getProperty("user.home");
         String destinationPath = userHome + "/Downloads/" + playlist.get(index);
+
+
+        //检查是否开始下载/禁止重复下载
+        if (startedFiles.contains(playlist.get(index))){
+            System.out.println("此曲正在下载: " + playlist.get(index));
+            return;
+        }
+
+            startedFiles.add(playlist.get(index));
+
+
 
         // 检查是否已经下载
         if (downloadedFiles.contains(destinationPath)) {
@@ -57,6 +69,7 @@ public class DownloadManager {
                     App.removeDownloadTask(taskList.indexOf(task)); // 从 UI 中移除
                     taskList.remove(task); // 从任务列表中移除
                     downloadedFiles.add(destinationPath); // 标记文件已下载
+                    startedFiles.remove(playlist.get(index));
                 });
             }
         };
@@ -72,6 +85,7 @@ public class DownloadManager {
         Thread thread = new Thread(task);
         thread.setDaemon(true);
         thread.start();
+
     }
 
     // 移除下载任务//这里还没用上
