@@ -2,6 +2,7 @@ package UI;
 
 import AudioPlayer.AudioPlayer;
 import Download.DownloadManager;
+import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -94,8 +95,16 @@ public class App extends Application {
         downloadPageButton.setOnMouseExited(_ -> downloadPageButton.setCursor(Cursor.DEFAULT));
         playPageButton.setOnMouseExited(_ -> playPageButton.setCursor(Cursor.DEFAULT));
 
-        HBox topBar = new HBox(10, downloadPageButton, playPageButton, warningLabel);
+        // use a spacer to make the warning on the right side
+        Region spacer = new Region();
+        spacer.setMinWidth(Region.USE_COMPUTED_SIZE);
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        //font size of the warning
+        warningLabel.setStyle("-fx-font-size: 16px;");
+
+        HBox topBar = new HBox(10, downloadPageButton, playPageButton, spacer, warningLabel);
         topBar.setStyle("-fx-padding: 6; -fx-background-color: #ececec;");
+
 
         VBox playerBar = new VBox(10);
         playerBar.setStyle("-fx-background-color: #f0f0f0; -fx-padding: 10;");
@@ -306,6 +315,9 @@ public class App extends Application {
 
     public static void updateWarning(String warning) {
         warningLabel.setText(warning);
+        PauseTransition pause = new PauseTransition(Duration.seconds(3));
+        pause.setOnFinished(_ -> warningLabel.setText(""));
+        pause.play();
     }
 
     private static void formatTime(Duration duration, Label label) {

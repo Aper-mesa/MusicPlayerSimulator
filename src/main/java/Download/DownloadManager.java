@@ -27,7 +27,7 @@ public class DownloadManager {
 
         //检查是否开始下载/禁止重复下载
         if (startedFiles.contains(playlist.get(index))) {
-            App.updateWarning("此曲正在下载: " + playlist.get(index));
+            App.updateWarning("Already downloading: " + playlist.get(index));
             return;
         }
 
