@@ -45,6 +45,7 @@ public class App extends Application {
     private static final Label currentTimeLabel = new Label("00: 00");
     private static final Label songDuration = new Label("00: 00");
     private static final List<HBox> downloadRows = new ArrayList<>();
+    private static final Label warningLabel = new Label();
 
     @Override
     public void start(Stage primaryStage) {
@@ -93,7 +94,7 @@ public class App extends Application {
         downloadPageButton.setOnMouseExited(_ -> downloadPageButton.setCursor(Cursor.DEFAULT));
         playPageButton.setOnMouseExited(_ -> playPageButton.setCursor(Cursor.DEFAULT));
 
-        HBox topBar = new HBox(10, downloadPageButton, playPageButton);
+        HBox topBar = new HBox(10, downloadPageButton, playPageButton, warningLabel);
         topBar.setStyle("-fx-padding: 6; -fx-background-color: #ececec;");
 
         VBox playerBar = new VBox(10);
@@ -301,6 +302,10 @@ public class App extends Application {
 
     public static void updateDownloadProgress(double progress, int index) {
         ((ProgressBar) downloadRows.get(index).getChildren().get(3)).setProgress(progress);
+    }
+
+    public static void updateWarning(String warning) {
+        warningLabel.setText(warning);
     }
 
     private static void formatTime(Duration duration, Label label) {
