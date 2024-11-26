@@ -229,9 +229,6 @@ public class App extends Application {
 
             // create a download task
             downloadButton.setOnAction(_ -> {
-                        // TODO temporary, used to rapidly switch to download page to see.
-                        //TODO  will remove after slow download speed
-                        root.setCenter(downloadPage);
                         dm.startDownload(finalI);
                     }
             );
@@ -276,7 +273,6 @@ public class App extends Application {
 
     public static void removeDownloadTask(int index) {
         System.out.println("remove download row with index " + index);
-        System.out.println(downloadRows);
         downloadPage.getChildren().remove(downloadRows.get(index));
         downloadRows.remove(index);
     }

@@ -2,6 +2,7 @@ package Download;
 
 import AudioPlayer.AudioPlayer;
 import UI.App;
+import javafx.application.Platform;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -52,10 +53,11 @@ public class DownloadManager {
 
             @Override
             public void onComplete() {
-                System.out.println("complete.....");
-                App.removeDownloadTask(taskList.indexOf(task)); // 从 UI 中移除
-                taskList.remove(task); // 从任务列表中移除
-                downloadedFiles.add(destinationPath); // 标记文件已下载
+                Platform.runLater(() -> {
+                    App.removeDownloadTask(taskList.indexOf(task)); // 从 UI 中移除
+                    taskList.remove(task); // 从任务列表中移除
+                    downloadedFiles.add(destinationPath); // 标记文件已下载
+                });
             }
         };
 
