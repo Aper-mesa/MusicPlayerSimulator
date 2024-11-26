@@ -68,6 +68,7 @@ public class DownloadManager {
                     taskList.remove(task); // 从任务列表中移除
                     downloadedFiles.add(destinationPath); // 标记文件已下载
                     startedFiles.remove(playlist.get(index));
+                    if (taskList.isEmpty()) App.showNoDownloadMessage();
                 });
             }
         };

@@ -47,6 +47,7 @@ public class App extends Application {
     private static final Label songDuration = new Label("00: 00");
     private static final List<HBox> downloadRows = new ArrayList<>();
     private static final Label warningLabel = new Label();
+    private static HBox noDownloadMessage;
 
     @Override
     public void start(Stage primaryStage) {
@@ -56,6 +57,12 @@ public class App extends Application {
         primaryStage.getIcons().add(icon);
 
         initContent();
+
+        Label noDownloadLabel = new Label("No Download");
+        noDownloadMessage = new HBox(noDownloadLabel);
+        noDownloadMessage.setAlignment(Pos.CENTER);
+        downloadPage.getChildren().add(noDownloadMessage);
+        noDownloadLabel.setStyle("-fx-font-size: 16px;");
 
         loadPlayPage();
 
@@ -244,6 +251,7 @@ public class App extends Application {
 
     //create a new download row in the download page
     public static void addDownloadRow(int index, int downloadIndex) {
+        downloadPage.getChildren().remove(noDownloadMessage);
         final boolean[] isDownloading = {true};
         HBox downloadRow = new HBox(5);
         downloadRows.add(downloadRow);
@@ -295,6 +303,10 @@ public class App extends Application {
         System.out.println("remove download row with index " + index);
         downloadPage.getChildren().remove(downloadRows.get(index));
         downloadRows.remove(index);
+    }
+
+    public static void showNoDownloadMessage() {
+        downloadPage.getChildren().add(noDownloadMessage);
     }
 
     public static void updatePlayProgress(double progress) {
