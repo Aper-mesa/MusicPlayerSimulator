@@ -101,13 +101,10 @@ public class AudioPlayer {
 
         if (isShuffle()) {
             playlist.selectTrackAndShuffle(uiIndex);
-            System.out.println("Shuffle mode: Playing track " + playlist.getCurrentTrack());
         } else if (isSingle()) {
             playlist.switchToSingleTrackPlaylist(uiIndex);
-            System.out.println("Single mode: Playing track " + playlist.getCurrentTrack());
         } else {
             playlist.setCurrentTrackIndex(uiIndex);
-            System.out.println("Sequential mode: Playing track " + playlist.getCurrentTrack());
         }
         play(playlist.getCurrentTrackIndex());
     }
@@ -115,21 +112,18 @@ public class AudioPlayer {
     public void resume() {
         if (mediaPlayer != null) {
             mediaPlayer.play();
-            System.out.println("Resumed: " + playlist.getCurrentTrack());
         }
     }
 
     public void pause() {
         if (mediaPlayer != null) {
             mediaPlayer.pause();
-            System.out.println("Paused: " + playlist.getCurrentTrack());
         }
     }
 
     public void stop() {
         if (mediaPlayer != null) {
             mediaPlayer.stop();
-            System.out.println("Stopped: " + playlist.getCurrentTrack());
         }
     }
 
@@ -195,6 +189,13 @@ public class AudioPlayer {
 
     private void handleTrackEnd() {
         playNext();
+    }
+
+    public boolean hasTrack() {
+        return mediaPlayer != null &&
+                mediaPlayer.getMedia() != null &&
+                mediaPlayer.getStatus() != MediaPlayer.Status.UNKNOWN &&
+                mediaPlayer.getStatus() != MediaPlayer.Status.DISPOSED;
     }
 
 }
