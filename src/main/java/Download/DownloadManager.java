@@ -60,6 +60,8 @@ public class DownloadManager {
 
         taskList.add(task);
 
+        App.addDownloadRow(index ,taskList.indexOf(task));
+
         // 设置回调
         task.setProgressCallback(callback);
 
