@@ -165,6 +165,7 @@ public class App extends Application {
         });
 
         playPauseButton.setOnAction(_ -> {
+            if (!player.hasTrack()) return;
             if (isPlaying) {
                 player.pause();
                 isPlaying = false;
