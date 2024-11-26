@@ -30,7 +30,7 @@ public class App extends Application {
     private final BorderPane root = new BorderPane();
     private static List<String> playlist;
     private final AudioPlayer player = new AudioPlayer();
-    private final DownloadManager dm = new DownloadManager();
+    private static final DownloadManager dm = new DownloadManager();
     private static final Label currentSongName = new Label();
     private Button playPauseButton;
     private Button modeButton;
@@ -267,11 +267,16 @@ public class App extends Application {
 
         downloadRow.setOnMouseEntered(_ -> downloadRow.setStyle("-fx-background-color: #ececec;"));
         downloadRow.setOnMouseExited(_ -> downloadRow.setStyle("-fx-background-color: transparent;"));
+
+        cancelButton.setOnAction(_ -> {
+            dm.removeTask(downloadIndex);
+            removeDownloadTask(downloadIndex);
+        });
     }
 
     public static void removeDownloadTask(int index) {
         System.out.println("remove download row with index " + index);
-        downloadRows.get(index).getChildren().clear();
+        System.out.println(downloadRows);
         downloadPage.getChildren().remove(downloadRows.get(index));
         downloadRows.remove(index);
     }

@@ -52,6 +52,7 @@ public class DownloadManager {
 
             @Override
             public void onComplete() {
+                System.out.println("complete.....");
                 App.removeDownloadTask(taskList.indexOf(task)); // 从 UI 中移除
                 taskList.remove(task); // 从任务列表中移除
                 downloadedFiles.add(destinationPath); // 标记文件已下载
@@ -82,7 +83,6 @@ public class DownloadManager {
         if (task != null) {
             task.cancel(); // 取消任务
             taskList.remove(index); // 从列表中移除任务
-            App.removeDownloadTask(index); // 更新 UI
             System.out.println("Task at index " + index + " has been removed.");
         }
     }
