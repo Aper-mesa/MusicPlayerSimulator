@@ -36,6 +36,8 @@ public class App extends Application {
     private Button modeButton;
     private static final Image pauseIcon = new Image(Objects.requireNonNull(App.class.getResourceAsStream("/icons/pause.png")));
     private static final Image hoverPauseIcon = new Image(Objects.requireNonNull(App.class.getResourceAsStream("/icons/pauseHover.png")));
+    private static final Image playIcon = new Image(Objects.requireNonNull(App.class.getResourceAsStream("/icons/play.png")));
+    private static final Image hoverPlayIcon = new Image(Objects.requireNonNull(App.class.getResourceAsStream("/icons/playHover.png")));
     private static final Image cancelIcon = new Image(Objects.requireNonNull(App.class.getResourceAsStream("/icons/cancel.png")));
     private static final Image hoverCancelIcon = new Image(
             Objects.requireNonNull(App.class.getResourceAsStream("/icons/cancelHover.png")));
@@ -69,8 +71,6 @@ public class App extends Application {
         Image nextIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/next.png")));
         Image hoverNextIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/nextHover.png")));
 
-        Image playIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/play.png")));
-        Image hoverPlayIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/playHover.png")));
         Image pauseIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/pause.png")));
         Image hoverPauseIcon = new Image(
                 Objects.requireNonNull(getClass().getResourceAsStream("/icons/pauseHover.png")));
@@ -228,15 +228,13 @@ public class App extends Application {
             });
 
             // create a download task
-            downloadButton.setOnAction(_ -> {
-                        dm.startDownload(finalI);
-                    }
-            );
+            downloadButton.setOnAction(_ -> dm.startDownload(finalI));
         }
     }
 
     //create a new download row in the download page
     public static void addDownloadRow(int index, int downloadIndex) {
+        final boolean[] isDownloading = {true};
         HBox downloadRow = new HBox(5);
         downloadRows.add(downloadRow);
         downloadRow.setPrefHeight(50);
@@ -264,6 +262,18 @@ public class App extends Application {
 
         downloadRow.setOnMouseEntered(_ -> downloadRow.setStyle("-fx-background-color: #ececec;"));
         downloadRow.setOnMouseExited(_ -> downloadRow.setStyle("-fx-background-color: transparent;"));
+
+        pauseButton.setOnAction(_ -> {
+            if (isDownloading[0]) {
+                dm.pauseTask(downloadIndex);
+                modifyButton(playIcon, hoverPlayIcon, pauseButton);
+                isDownloading[0] = false;
+            } else {
+                dm.resumeTask(downloadIndex);
+                modifyButton(pauseIcon, hoverPauseIcon, pauseButton);
+                isDownloading[0] = true;
+            }
+        });
 
         cancelButton.setOnAction(_ -> {
             dm.removeTask(downloadIndex);
