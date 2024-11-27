@@ -63,10 +63,8 @@ public class DownloadTask implements Runnable {
                         closeStreams(in, out);
                         if (destination.exists() && !destination.delete()) {
                             progressCallback.onError(new IOException("Failed to delete incomplete file"));
-                            App.updateWarning("Failed to delete incomplete file");
                         } else {
                             System.out.println("Incomplete file deleted successfully.");
-                            App.updateWarning("Incomplete file deleted successfully.");
                         }
                         progressCallback.onCancelled();
                         return; // 立即退出 // Exit immediately
@@ -82,14 +80,16 @@ public class DownloadTask implements Runnable {
                 progressCallback.updateProgress((double) bytesRead / totalBytes);
 
                 // 3. 控制下载速度 // 3. Control download speed
-                long currentTime = System.currentTimeMillis();
-                if (bytesDownloadedThisSecond >= speed) {
-                    long timeElapsed = currentTime - lastTime;
-                    if (timeElapsed < 1000) {
-                        Thread.sleep(1000 - timeElapsed); // 精确控制下载速度 // Accurately control download speed
+                synchronized (lock) {
+                    if (bytesDownloadedThisSecond >= speed) {
+                        long currentTime = System.currentTimeMillis();
+                        long timeElapsed = currentTime - lastTime;
+                        if (timeElapsed < 1000) {
+                            lock.wait(1000 - timeElapsed); // 进入等待，减少资源消耗
+                        }
+                        lastTime = System.currentTimeMillis();
+                        bytesDownloadedThisSecond = 0;
                     }
-                    lastTime = System.currentTimeMillis();
-                    bytesDownloadedThisSecond = 0;
                 }
             }
 
