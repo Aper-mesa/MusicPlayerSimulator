@@ -25,7 +25,10 @@ public class DownloadTask implements Runnable {
         File source = new File(sourcePath);
         File destination = new File(destinationPath);
 
-        try {
+        // 确保流可以在任意情况下正确关闭
+        try (InputStream in = new FileInputStream(source);
+             OutputStream out = new FileOutputStream(destination)) {
+
             if (!source.exists() || !source.isFile()) {
                 throw new FileNotFoundException("Source file does not exist: " + sourcePath);
             }
@@ -39,53 +42,74 @@ public class DownloadTask implements Runnable {
             long lastTime = System.currentTimeMillis();
             long bytesDownloadedThisSecond = 0;
 
-            try (InputStream in = new FileInputStream(source);
-                 OutputStream out = new FileOutputStream(destination)) {
-                byte[] buffer = new byte[1024];
-                int bytes;
+            byte[] buffer = new byte[1024];
+            int bytes;
 
-                while ((bytes = in.read(buffer)) != -1) {
-                    synchronized (lock) {
-                        while (isPaused) {
-                            lock.wait();
-                        }
-                        if (isCancelled) {
-                            if (destination.exists() && !destination.delete()) {
-                                progressCallback.onError(new IOException("Failed to delete incomplete file"));
-                            }
-                            progressCallback.onCancelled();
-                            return;
-                        }
+            while ((bytes = in.read(buffer)) != -1) {
+                // 1. 同步检查暂停和取消状态
+                synchronized (lock) {
+                    // 如果暂停，等待恢复
+                    while (isPaused) {
+                        lock.wait();
                     }
 
-                    out.write(buffer, 0, bytes);
-                    bytesRead += bytes;
-                    bytesDownloadedThisSecond += bytes;
-
-                    progressCallback.updateProgress((double) bytesRead / totalBytes);
-
-                    // 控制下载速度
-                    long currentTime = System.currentTimeMillis();
-                    if (bytesDownloadedThisSecond >= speed) {
-                        long timeElapsed = currentTime - lastTime;
-                        if (timeElapsed < 1000) {
-                            Thread.sleep(1000 - timeElapsed);
+                    // 检查是否取消
+                    if (isCancelled) {
+                        // 2. 确保流被关闭后尝试删除文件
+                        closeStreams(in, out);
+                        if (destination.exists() && !destination.delete()) {
+                            progressCallback.onError(new IOException("Failed to delete incomplete file"));
+                        } else {
+                            System.out.println("Incomplete file deleted successfully.");
                         }
-                        lastTime = System.currentTimeMillis();
-                        bytesDownloadedThisSecond = 0;
+                        progressCallback.onCancelled();
+                        return; // 立即退出
                     }
                 }
 
-                progressCallback.updateProgress(1.0);
-                progressCallback.onComplete();
+                // 写入数据并更新进度
+                out.write(buffer, 0, bytes);
+                bytesRead += bytes;
+                bytesDownloadedThisSecond += bytes;
+
+                // 更新进度条
+                progressCallback.updateProgress((double) bytesRead / totalBytes);
+
+                // 3. 控制下载速度
+                long currentTime = System.currentTimeMillis();
+                if (bytesDownloadedThisSecond >= speed) {
+                    long timeElapsed = currentTime - lastTime;
+                    if (timeElapsed < 1000) {
+                        Thread.sleep(1000 - timeElapsed); // 精确控制下载速度
+                    }
+                    lastTime = System.currentTimeMillis();
+                    bytesDownloadedThisSecond = 0;
+                }
             }
+
+            // 下载完成，更新进度并回调
+            progressCallback.updateProgress(1.0);
+            progressCallback.onComplete();
+
         } catch (IOException | InterruptedException e) {
+            // 捕获异常，通知回调
             progressCallback.onError(e);
             if (e instanceof InterruptedException) {
-                Thread.currentThread().interrupt();
+                Thread.currentThread().interrupt(); // 恢复中断状态
             }
         }
     }
+
+    // 辅助方法：确保流安全关闭
+    private void closeStreams(InputStream in, OutputStream out) {
+        try {
+            if (in != null) in.close();
+            if (out != null) out.close();
+        } catch (IOException e) {
+            System.err.println("Error closing streams: " + e.getMessage());
+        }
+    }
+
 
     // 暂停任务
     public void pause() {

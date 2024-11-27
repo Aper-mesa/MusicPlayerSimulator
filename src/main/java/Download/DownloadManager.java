@@ -4,6 +4,7 @@ import AudioPlayer.AudioPlayer;
 import UI.App;
 import javafx.application.Platform;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,12 +27,13 @@ public class DownloadManager {
 
 
         //检查是否开始下载/禁止重复下载
-        if (startedFiles.contains(playlist.get(index))) {
-            App.updateWarning("Already downloading: " + playlist.get(index));
+        if (startedFiles.contains(playlist.get(index))){
+            System.out.println("此曲正在下载: " + playlist.get(index));
             return;
         }
 
         startedFiles.add(playlist.get(index));
+
 
 
         // 检查是否已经下载
@@ -68,14 +70,13 @@ public class DownloadManager {
                     taskList.remove(task); // 从任务列表中移除
                     downloadedFiles.add(destinationPath); // 标记文件已下载
                     startedFiles.remove(playlist.get(index));
-                    if (taskList.isEmpty()) App.showNoDownloadMessage();
                 });
             }
         };
 
         taskList.add(task);
 
-        App.addDownloadRow(index, taskList.indexOf(task));
+        App.addDownloadRow(index ,taskList.indexOf(task));
 
         // 设置回调
         task.setProgressCallback(callback);
