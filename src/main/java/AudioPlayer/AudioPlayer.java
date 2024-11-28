@@ -4,16 +4,17 @@ import UI.App;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.collections.MapChangeListener;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.media.AudioSpectrumListener;
+import javafx.scene.image.Image;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 
 import java.net.URL;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 public class AudioPlayer {
@@ -87,8 +88,10 @@ public class AudioPlayer {
             URL resource = getClass().getResource(trackPath);
             if (resource != null) {
                 media = new Media(resource.toString());
+
                 mediaPlayer = new MediaPlayer(media);
                 mediaPlayer.setOnReady(() -> {
+                    App.updateAlbum((Image) media.getMetadata().get("image"));
                     String trackName = playlist.getCurrentTrack();
                     App.updatePlayBar(media.getDuration(), trackName);
                     startProgressUpdater();

@@ -24,8 +24,9 @@ import java.util.concurrent.TimeUnit;
 
 public class App extends Application {
     private final static int BUTTON_SIZE = 25;
-    private final static int PROGRESS_WIDTH = 400;
+    private final static int PROGRESS_WIDTH = 350;
     private static final ProgressBar progressBar = new ProgressBar(0.0);
+    private static final int ALBUM_SIZE = 113;
     private final VBox playPage = new VBox();
     private static final VBox downloadPage = new VBox();
     private final BorderPane root = new BorderPane();
@@ -34,7 +35,7 @@ public class App extends Application {
     private static final DownloadManager dm = new DownloadManager();
     private static final Label currentSongName = new Label();
     private Button playPauseButton;
-    private Button modeButton;
+    private static Button modeButton;
     private static final Image pauseIcon = new Image(Objects.requireNonNull(App.class.getResourceAsStream("/icons/pause.png")));
     private static final Image hoverPauseIcon = new Image(Objects.requireNonNull(App.class.getResourceAsStream("/icons/pauseHover.png")));
     private static final Image playIcon = new Image(Objects.requireNonNull(App.class.getResourceAsStream("/icons/play.png")));
@@ -48,6 +49,7 @@ public class App extends Application {
     private static final List<HBox> downloadRows = new ArrayList<>();
     private static final Label warningLabel = new Label();
     private static HBox noDownloadMessage;
+    private static final ImageView album = new ImageView();
 
     @Override
     public void start(Stage primaryStage) {
@@ -112,9 +114,18 @@ public class App extends Application {
         HBox topBar = new HBox(10, downloadPageButton, playPageButton, spacer, warningLabel);
         topBar.setStyle("-fx-padding: 6; -fx-background-color: #ececec;");
 
+        // the largest box, contains the album image and the player info
+        StackPane bottomArea = new StackPane();
 
         VBox playerBar = new VBox(10);
         playerBar.setStyle("-fx-background-color: #f0f0f0; -fx-padding: 10;");
+
+        bottomArea.getChildren().addAll(playerBar, album);
+        StackPane.setAlignment(album, Pos.CENTER_LEFT);
+
+        album.setFitWidth(ALBUM_SIZE);
+        album.setFitHeight(ALBUM_SIZE);
+        album.setPreserveRatio(true);
 
         HBox controls = new HBox(10);
         controls.setAlignment(Pos.CENTER);
@@ -140,7 +151,7 @@ public class App extends Application {
         controls.getChildren().addAll(spacer1, prevButton, playPauseButton, nextButton, modeButton, spacer2);
 
         progressBar.setPrefWidth(PROGRESS_WIDTH);
-        HBox progressBarContainer = new HBox(10);
+        HBox progressBarContainer = new HBox(5);
         progressBarContainer.getChildren().addAll(currentTimeLabel, progressBar, songDuration);
 
         progressBarContainer.setAlignment(Pos.CENTER);
@@ -149,7 +160,7 @@ public class App extends Application {
 
         root.setTop(topBar);
         root.setCenter(playPage);
-        root.setBottom(playerBar);
+        root.setBottom(bottomArea);
 
         downloadPageButton.setOnAction(_ -> root.setCenter(downloadPage));
         playPageButton.setOnAction(_ -> root.setCenter(playPage));
@@ -202,6 +213,13 @@ public class App extends Application {
                 modifyButton(cycleIcon, hoverCycleIcon, modeButton);
             }
         });
+
+        album.setOnMouseClicked(_ -> {
+            System.out.println("album clicked");
+        });
+
+        album.setOnMouseEntered(_ -> album.setCursor(Cursor.HAND));
+        album.setOnMouseExited(_ -> album.setCursor(Cursor.DEFAULT));
     }
 
     private void loadPlayPage() {
@@ -331,6 +349,11 @@ public class App extends Application {
         PauseTransition pause = new PauseTransition(Duration.seconds(3));
         pause.setOnFinished(_ -> warningLabel.setText(""));
         pause.play();
+    }
+
+    public static void updateAlbum(Image cover) {
+        album.setImage(cover);
+        System.out.println(album.getX());
     }
 
     private static void formatTime(Duration duration, Label label) {
