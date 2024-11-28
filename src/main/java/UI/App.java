@@ -166,6 +166,7 @@ public class App extends Application {
         playPageButton.setOnAction(_ -> root.setCenter(playPage));
 
         progressBar.setOnMouseClicked(e -> {
+            if (!player.hasTrack()) return;
             double mouseX = e.getX();
             double progressBarWidth = progressBar.getWidth();
             double progress = mouseX / progressBarWidth;
@@ -353,7 +354,6 @@ public class App extends Application {
 
     public static void updateAlbum(Image cover) {
         album.setImage(cover);
-        System.out.println(album.getX());
     }
 
     private static void formatTime(Duration duration, Label label) {
