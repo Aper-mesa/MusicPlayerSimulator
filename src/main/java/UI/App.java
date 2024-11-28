@@ -66,7 +66,7 @@ public class App extends Application {
 
         loadPlayPage();
 
-        Scene scene = new Scene(root, 800, 600);
+        Scene scene = new Scene(root, 700, 600);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();

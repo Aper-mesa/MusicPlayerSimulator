@@ -41,9 +41,9 @@ public class DownloadManager {
 
         System.out.println("2:After checkDownloadedFiles(), downloadedFiles: " + downloadedFiles);
         if (downloadedFiles.contains(destinationPath)) {
-                System.out.println("This song has already been downloaded: " + playlist.get(index));
-                App.updateWarning("This song has already been downloaded");
-                return;
+            System.out.println("This song has already been downloaded: " + playlist.get(index));
+            App.updateWarning("This song has already been downloaded");
+            return;
         }
 
         // 创建任务对象
@@ -73,6 +73,7 @@ public class DownloadManager {
                     taskList.remove(task);
                     downloadedFiles.add(destinationPath); // 标记文件已下载
                     startedFiles.remove(playlist.get(index));
+                    if (taskList.isEmpty()) App.showNoDownloadMessage();
                 });
             }
         };
@@ -97,7 +98,7 @@ public class DownloadManager {
             File file = new File(filePath);
             if (!file.exists()) {
                 filesToRemove.add(filePath); // 如果文件不存在，添加到移除列表//if file not exist, add to arraylist "filesToRemove"
-                System.out.println("removelist"+filesToRemove);
+                System.out.println("removelist" + filesToRemove);
             }
         }
         downloadedFiles.removeAll(filesToRemove); // 从下载记录中移除这些文件//remove file from downloadFiles
@@ -117,6 +118,7 @@ public class DownloadManager {
             taskList.remove(index); // 从列表中移除任务 // Remove the task from the list
             System.out.println("Task at index " + index + " has been removed.");
         }
+        if (taskList.isEmpty()) App.showNoDownloadMessage();
     }
 
     // 调整下载速度 // Adjust the download speed
