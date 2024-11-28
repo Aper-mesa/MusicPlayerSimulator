@@ -4,22 +4,31 @@ import UI.App;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.media.AudioSpectrumListener;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 
 import java.net.URL;
 import java.util.List;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class AudioPlayer {
     private MediaPlayer mediaPlayer;
     private final Playlist playlist;
     private Timeline proTimeline;
     private Media media;
+    private Canvas spectrumCanvas;
     private int playbackMode = 0;
     public static final int CYCLE = 0;
     public static final int SHUFFLE = 1;
     public static final int SINGLE = 2;
+
+    private static final int DELAY_FRAMES = 3;
+    private Queue<float[]> magnitudeQueue = new LinkedList<>();
 
     public AudioPlayer() {
         playlist = new Playlist();
@@ -31,6 +40,10 @@ public class AudioPlayer {
 
     public int getPlaybackMode() {
         return playbackMode;
+    }
+
+    public void setSpectrumCanvas(Canvas canvas) {
+        this.spectrumCanvas = canvas;
     }
 
     public boolean isSingle() {
@@ -79,10 +92,12 @@ public class AudioPlayer {
                     String trackName = playlist.getCurrentTrack();
                     App.updatePlayBar(media.getDuration(), trackName);
                     startProgressUpdater();
+
+                    if (spectrumCanvas != null) {
+                        enableAudioSpectrum();
+                    }
                 });
-                mediaPlayer.setOnEndOfMedia(() -> {
-                    handleTrackEnd();
-                });
+                mediaPlayer.setOnEndOfMedia(this::handleTrackEnd);
 
                 mediaPlayer.play();
             } else {
@@ -157,6 +172,41 @@ public class AudioPlayer {
 
     public void reloadFilePlaylist() {
         playlist.reloadFilePlaylist();
+    }
+
+    public void enableAudioSpectrum() {
+        if (mediaPlayer != null && spectrumCanvas != null) {
+            mediaPlayer.setAudioSpectrumInterval(1.0 / 60.0);
+            mediaPlayer.setAudioSpectrumNumBands(64);
+            mediaPlayer.setAudioSpectrumThreshold(-60);
+
+            GraphicsContext gc = spectrumCanvas.getGraphicsContext2D();
+            mediaPlayer.setAudioSpectrumListener((timestamp, duration, magnitudes, phases) -> {
+
+                float[] magnitudesCopy = new float[magnitudes.length];
+                System.arraycopy(magnitudes, 0, magnitudesCopy, 0, magnitudes.length);
+
+                magnitudeQueue.offer(magnitudesCopy);
+                if (magnitudeQueue.size() > DELAY_FRAMES) {
+                    float[] delayedMagnitudes = magnitudeQueue.poll();
+
+                    Platform.runLater(() -> {
+                        gc.clearRect(0, 0, spectrumCanvas.getWidth(), spectrumCanvas.getHeight());
+                        double width = spectrumCanvas.getWidth() / delayedMagnitudes.length;
+
+                        for (int i = 0; i < delayedMagnitudes.length; i++) {
+                            double height = Math.max(0,
+                                    (spectrumCanvas.getHeight() / 2) * ((delayedMagnitudes[i] + 60) / 60.0));
+                            gc.fillRect(i * width, spectrumCanvas.getHeight() - height, width - 2, height);
+                        }
+                    });
+                }
+            });
+        } else if (spectrumCanvas == null) {
+            System.err.println("Spectrum Canvas is not set.");
+        } else {
+            System.err.println("MediaPlayer is null. Cannot enable audio spectrum.");
+        }
     }
 
     private void startProgressUpdater() {
