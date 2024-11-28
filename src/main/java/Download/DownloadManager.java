@@ -4,13 +4,15 @@ import AudioPlayer.AudioPlayer;
 import UI.App;
 import javafx.application.Platform;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class DownloadManager {
     private final List<String> playlist; // 播放列表 // Playlist
     private final List<DownloadTask> taskList = new ArrayList<>(); // 下载任务列表 // Download task list
-    private final List<String> downloadedFiles = new ArrayList<>(); // 已完成下载的集合 // List of completed downloads
+    private final List<String> downloadedFiles = Collections.synchronizedList(new ArrayList<>());
     private final List<String> startedFiles = new ArrayList<>(); // 已开始下载的集合 // List of started downloads
 
     public DownloadManager() {
@@ -24,7 +26,11 @@ public class DownloadManager {
         String userHome = System.getProperty("user.home");
         String destinationPath = userHome + "/Downloads/" + playlist.get(index);
 
-        // 检查是否开始下载/禁止重复下载 // Check if the download has started to prevent duplicate downloads
+        System.out.println("Current downloadedFiles: " + downloadedFiles);
+        checkDownloadedFiles();  // 清理已删除文件的路径
+
+
+        // 检查是否开始下载/禁止重复下载
         if (startedFiles.contains(playlist.get(index))) {
             System.out.println("This song is already downloading: " + playlist.get(index));
             App.updateWarning("This song is already downloading");
@@ -33,22 +39,21 @@ public class DownloadManager {
 
         startedFiles.add(playlist.get(index));
 
-        // 检查是否已经下载 // Check if the file has already been downloaded
+        System.out.println("2:After checkDownloadedFiles(), downloadedFiles: " + downloadedFiles);
         if (downloadedFiles.contains(destinationPath)) {
-            System.out.println("This song has already been downloaded: " + playlist.get(index));
-            App.updateWarning("This song has already been downloaded");
-            return;
+                System.out.println("This song has already been downloaded: " + playlist.get(index));
+                App.updateWarning("This song has already been downloaded");
+                return;
         }
 
-        // 创建任务对象 // Create the task object
-        // 先创建任务对象，但暂时不设置回调 // Create the task object without setting a callback yet
+        // 创建任务对象
         DownloadTask task = new DownloadTask(sourcePath, destinationPath, null);
 
-        // 创建回调并延迟绑定 // Create the callback and bind it later
+        // 创建回调并延迟绑定
         ProgressCallback callback = new ProgressCallback() {
             @Override
             public void updateProgress(double progress) {
-                App.updateDownloadProgress(progress, taskList.indexOf(task)); // 使用 task // Use the task
+                App.updateDownloadProgress(progress, taskList.indexOf(task));
             }
 
             @Override
@@ -64,25 +69,38 @@ public class DownloadManager {
             @Override
             public void onComplete() {
                 Platform.runLater(() -> {
-                    App.removeDownloadTask(taskList.indexOf(task)); // 从 UI 中移除 // Remove from the UI
-                    taskList.remove(task); // 从任务列表中移除 // Remove from the task list
-                    downloadedFiles.add(destinationPath); // 标记文件已下载 // Mark the file as downloaded
+                    App.removeDownloadTask(taskList.indexOf(task));
+                    taskList.remove(task);
+                    downloadedFiles.add(destinationPath); // 标记文件已下载
                     startedFiles.remove(playlist.get(index));
                 });
             }
         };
 
         taskList.add(task);
-
         App.addDownloadRow(index, taskList.indexOf(task));
 
-        // 设置回调 // Set the callback
+        // 设置回调
         task.setProgressCallback(callback);
 
-        // 启动任务 // Start the task
+        // 启动任务
         Thread thread = new Thread(task);
         thread.setDaemon(true);
         thread.start();
+    }
+
+    public void checkDownloadedFiles() {
+        System.out.println("2: Before cleaning, downloadedFiles: " + downloadedFiles);
+        // 遍历下载目录中的所有文件，移除已删除的文件路径
+        List<String> filesToRemove = new ArrayList<>();
+        for (String filePath : downloadedFiles) {
+            File file = new File(filePath);
+            if (!file.exists()) {
+                filesToRemove.add(filePath); // 如果文件不存在，添加到移除列表
+                System.out.println("removelist"+filesToRemove);
+            }
+        }
+        downloadedFiles.removeAll(filesToRemove); // 从下载记录中移除这些文件
     }
 
     // 移除下载任务 // Remove the download task (not yet used)

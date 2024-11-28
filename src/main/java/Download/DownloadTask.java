@@ -11,7 +11,7 @@ public class DownloadTask implements Runnable {
     private volatile boolean isCancelled = false; // 是否取消 // Whether the task is cancelled
     private ProgressCallback progressCallback; // 进度回调接口 // Progress callback interface
     private final Object lock = new Object(); // 用于暂停和取消的锁 // Lock for pause and cancel synchronization
-    private volatile long speed = 1024 * 800; // 下载速度（字节/秒），这里可以限制下载速度大小 // Download speed (bytes/second), can limit download speed
+    private volatile long speed = 1024 * 1000; // 下载速度（字节/秒），这里可以限制下载速度大小 // Download speed (bytes/second), can limit download speed
 
     public DownloadTask(String sourcePath, String destinationPath, ProgressCallback progressCallback) {
         this.sourcePath = sourcePath;
