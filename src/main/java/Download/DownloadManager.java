@@ -80,10 +80,10 @@ public class DownloadManager {
         taskList.add(task);
         App.addDownloadRow(index, taskList.indexOf(task));
 
-        // 设置回调
+        // 设置回调//set callback
         task.setProgressCallback(callback);
 
-        // 启动任务
+        // 启动任务//start
         Thread thread = new Thread(task);
         thread.setDaemon(true);
         thread.start();
@@ -91,16 +91,16 @@ public class DownloadManager {
 
     public void checkDownloadedFiles() {
         System.out.println("2: Before cleaning, downloadedFiles: " + downloadedFiles);
-        // 遍历下载目录中的所有文件，移除已删除的文件路径
+        // 遍历下载目录中的所有文件，移除已删除的文件路径 //travel all file in dir, remove the file in "downloadedFiles" which already deleted in dir
         List<String> filesToRemove = new ArrayList<>();
         for (String filePath : downloadedFiles) {
             File file = new File(filePath);
             if (!file.exists()) {
-                filesToRemove.add(filePath); // 如果文件不存在，添加到移除列表
+                filesToRemove.add(filePath); // 如果文件不存在，添加到移除列表//if file not exist, add to arraylist "filesToRemove"
                 System.out.println("removelist"+filesToRemove);
             }
         }
-        downloadedFiles.removeAll(filesToRemove); // 从下载记录中移除这些文件
+        downloadedFiles.removeAll(filesToRemove); // 从下载记录中移除这些文件//remove file from downloadFiles
     }
 
     // 移除下载任务 // Remove the download task (not yet used)
