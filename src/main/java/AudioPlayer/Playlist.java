@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
+import java.net.URL;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -47,6 +48,14 @@ public class Playlist {
 
     public int getCurrentTrackIndex() {
         return currentTrackIndex;
+    }
+
+    public URL getTrackUrl(String trackName) throws Exception {
+        URL songURL = getClass().getResource("/songs/" + trackName);
+        if (songURL == null) {
+            throw new Exception("Track not found: " + trackName);
+        }
+        return songURL;
     }
 
     public void setCurrentTrackIndex(int index) {
