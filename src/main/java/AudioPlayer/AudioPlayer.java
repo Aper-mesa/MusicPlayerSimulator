@@ -28,7 +28,7 @@ public class AudioPlayer {
     public static final int SINGLE = 2;
 
     private static final int DELAY_FRAMES = 3;
-    private Queue<float[]> magnitudeQueue = new LinkedList<>();
+    private final Queue<float[]> magnitudeQueue = new LinkedList<>();
 
     public AudioPlayer() {
         playlist = new Playlist();
@@ -36,10 +36,6 @@ public class AudioPlayer {
 
     public List<String> getPlaylist() {
         return playlist.getFilePlaylist();
-    }
-
-    public int getPlaybackMode() {
-        return playbackMode;
     }
 
     public void setSpectrumCanvas(Canvas canvas) {
@@ -90,11 +86,10 @@ public class AudioPlayer {
 
                 mediaPlayer = new MediaPlayer(media);
                 mediaPlayer.setOnReady(() -> {
-                    App.updateAlbum((Image) media.getMetadata().get("image"));
-                    String trackName = playlist.getCurrentTrack();
-                    App.updatePlayBar(media.getDuration(), trackName);
+                    App.updateAlbum((Image) media.getMetadata().get("image"),
+                            (String) media.getMetadata().get("title"),
+                            media.getDuration(), (String) media.getMetadata().get("artist"));
                     startProgressUpdater();
-
                     if (spectrumCanvas != null) {
                         enableAudioSpectrum();
                     }
@@ -155,17 +150,6 @@ public class AudioPlayer {
         playlist.previousTrack();
         play(playlist.getCurrentTrackIndex());
         return playlist.getCurrentTrackIndex();
-    }
-
-    public double getPlaybackProgress() {
-        if (mediaPlayer != null) {
-            Duration currentTime = mediaPlayer.getCurrentTime();
-            Duration totalDuration = mediaPlayer.getTotalDuration();
-            if (totalDuration != null && totalDuration.greaterThan(Duration.ZERO)) {
-                return (currentTime.toMillis() / totalDuration.toMillis());
-            }
-        }
-        return 0.0;
     }
 
     public void restorePlaylistOrder() {
@@ -243,11 +227,11 @@ public class AudioPlayer {
         playNext();
     }
 
-    public boolean hasTrack() {
-        return mediaPlayer != null &&
-                mediaPlayer.getMedia() != null &&
-                mediaPlayer.getStatus() != MediaPlayer.Status.UNKNOWN &&
-                mediaPlayer.getStatus() != MediaPlayer.Status.DISPOSED;
+    public boolean noTrack() {
+        return mediaPlayer == null ||
+                mediaPlayer.getMedia() == null ||
+                mediaPlayer.getStatus() == MediaPlayer.Status.UNKNOWN ||
+                mediaPlayer.getStatus() == MediaPlayer.Status.DISPOSED;
     }
 
 }

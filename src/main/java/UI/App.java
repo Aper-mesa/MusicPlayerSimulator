@@ -4,6 +4,7 @@ import AudioPlayer.AudioPlayer;
 import Download.DownloadManager;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
@@ -13,6 +14,7 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 public class App extends Application {
     private final static int BUTTON_SIZE = 25;
-    private final static int PROGRESS_WIDTH = 350;
+    private final static int PROGRESS_WIDTH = 475;
     private static final ProgressBar progressBar = new ProgressBar(0.0);
     private static final int ALBUM_SIZE = 113;
     private final VBox playPage = new VBox();
@@ -50,6 +52,7 @@ public class App extends Application {
     private static final Label warningLabel = new Label();
     private static HBox noDownloadMessage;
     private static final ImageView album = new ImageView();
+    private static final Label artistsLabel = new Label();
 
     @Override
     public void start(Stage primaryStage) {
@@ -68,7 +71,7 @@ public class App extends Application {
 
         loadPlayPage();
 
-        Scene scene = new Scene(root, 700, 600);
+        Scene scene = new Scene(root, 700, 700);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
@@ -127,11 +130,20 @@ public class App extends Application {
         album.setFitHeight(ALBUM_SIZE);
         album.setPreserveRatio(true);
 
+        //contains the artists name and the controls buttons
+        HBox middleBar = new HBox(10);
         HBox controls = new HBox(10);
+
+        Region spacer1 = new Region();
+        HBox.setHgrow(spacer1, Priority.ALWAYS);
+        Region spacer2 = new Region();
+        spacer2.setPrefWidth(50);
+        middleBar.getChildren().addAll(artistsLabel, spacer1, controls, spacer2);
+
         controls.setAlignment(Pos.CENTER);
 
         HBox currentSong = new HBox(10);
-        currentSong.setAlignment(Pos.CENTER);
+        currentSong.setPadding(new Insets(0, 0, 0, 115));
 
         currentSongName.setStyle("-fx-font-size: 16px;");
 
@@ -143,20 +155,18 @@ public class App extends Application {
         player.setPlaybackMode(AudioPlayer.CYCLE);
         modeButton = getButton(cycleIcon, hoverCycleIcon);
 
-        Region spacer1 = new Region();
-        Region spacer2 = new Region();
-        HBox.setHgrow(spacer1, Priority.ALWAYS);
-        HBox.setHgrow(spacer2, Priority.ALWAYS);
+        artistsLabel.setPadding(new Insets(0, 0, 0, 115));
+        artistsLabel.setTextFill(Color.GRAY);
 
-        controls.getChildren().addAll(spacer1, prevButton, playPauseButton, nextButton, modeButton, spacer2);
+        controls.getChildren().addAll(prevButton, playPauseButton, nextButton, modeButton);
 
         progressBar.setPrefWidth(PROGRESS_WIDTH);
-        HBox progressBarContainer = new HBox(5);
+        HBox progressBarContainer = new HBox(10);
         progressBarContainer.getChildren().addAll(currentTimeLabel, progressBar, songDuration);
 
-        progressBarContainer.setAlignment(Pos.CENTER);
+        progressBarContainer.setAlignment(Pos.CENTER_RIGHT);
 
-        playerBar.getChildren().addAll(currentSong, controls, progressBarContainer);
+        playerBar.getChildren().addAll(currentSong, middleBar, progressBarContainer);
 
         root.setTop(topBar);
         root.setCenter(playPage);
@@ -166,7 +176,7 @@ public class App extends Application {
         playPageButton.setOnAction(_ -> root.setCenter(playPage));
 
         progressBar.setOnMouseClicked(e -> {
-            if (!player.hasTrack()) return;
+            if (player.noTrack()) return;
             double mouseX = e.getX();
             double progressBarWidth = progressBar.getWidth();
             double progress = mouseX / progressBarWidth;
@@ -177,7 +187,7 @@ public class App extends Application {
         });
 
         playPauseButton.setOnAction(_ -> {
-            if (!player.hasTrack()) return;
+            if (player.noTrack()) return;
             if (isPlaying) {
                 player.pause();
                 isPlaying = false;
@@ -240,7 +250,7 @@ public class App extends Application {
             songNumber.setPrefWidth(50);
             songNumber.setStyle("-fx-font-size: 16px;");
 
-            Label songName = new Label(playlist.get(i));
+            Label songName = new Label(playlist.get(i).split("\\.mp3")[0]);
             songName.setStyle("-fx-font-size: 16px;");
 
             Region spacer = new Region();
@@ -260,7 +270,6 @@ public class App extends Application {
             playButton.setOnAction(_ -> {
                 isPlaying = true;
                 player.playFromUI(finalI);
-                currentSongName.setText(songName.getText());
                 modifyButton(pauseIcon, hoverPauseIcon, playPauseButton);
             });
 
@@ -333,14 +342,6 @@ public class App extends Application {
         progressBar.setProgress(progress);
     }
 
-    // used when a song starts
-    public static void updatePlayBar(Duration duration, String trackName) {
-        // update song name on the play bar
-        currentSongName.setText(trackName);
-        // display song duration
-        formatTime(duration, songDuration);
-    }
-
     public static void updateDownloadProgress(double progress, int index) {
         ((ProgressBar) downloadRows.get(index).getChildren().get(3)).setProgress(progress);
     }
@@ -352,8 +353,14 @@ public class App extends Application {
         pause.play();
     }
 
-    public static void updateAlbum(Image cover) {
+    public static void updateAlbum(Image cover, String name, Duration duration, String artists) {
         album.setImage(cover);
+        System.out.println(name);
+        currentSongName.setText(name);
+        artistsLabel.setText(artists);
+
+        // display song duration
+        formatTime(duration, songDuration);
     }
 
     private static void formatTime(Duration duration, Label label) {
