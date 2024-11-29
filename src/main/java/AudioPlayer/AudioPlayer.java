@@ -163,7 +163,7 @@ public class AudioPlayer {
     public void enableAudioSpectrum() {
         if (mediaPlayer != null && spectrumCanvas != null) {
             mediaPlayer.setAudioSpectrumInterval(1.0 / 60.0);
-            mediaPlayer.setAudioSpectrumNumBands(64);
+            mediaPlayer.setAudioSpectrumNumBands(20);
             mediaPlayer.setAudioSpectrumThreshold(-60);
 
             GraphicsContext gc = spectrumCanvas.getGraphicsContext2D();
