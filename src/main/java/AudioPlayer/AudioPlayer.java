@@ -182,7 +182,7 @@ public class AudioPlayer {
 
                         for (int i = 0; i < delayedMagnitudes.length; i++) {
                             double height = Math.max(0,
-                                    (spectrumCanvas.getHeight() / 2) * ((delayedMagnitudes[i] + 60) / 60.0));
+                                    (spectrumCanvas.getHeight()) * ((delayedMagnitudes[i] + 60) / 60.0));
                             gc.fillRect(i * width, spectrumCanvas.getHeight() - height, width - 2, height);
                         }
                     });

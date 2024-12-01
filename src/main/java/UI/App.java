@@ -8,6 +8,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -121,7 +122,7 @@ public class App extends Application {
         StackPane bottomArea = new StackPane();
 
         VBox playerBar = new VBox(10);
-        playerBar.setStyle("-fx-background-color: #f0f0f0; -fx-padding: 10;");
+        playerBar.setStyle("-fx-background-color: #ececec; -fx-padding: 10;");
 
         bottomArea.getChildren().addAll(playerBar, album);
         StackPane.setAlignment(album, Pos.CENTER_LEFT);
@@ -137,17 +138,22 @@ public class App extends Application {
         Region spacer1 = new Region();
         HBox.setHgrow(spacer1, Priority.ALWAYS);
         Region spacer2 = new Region();
-        spacer2.setPrefWidth(50);
+        spacer2.setPrefWidth(30);
         middleBar.getChildren().addAll(artistsLabel, spacer1, controls, spacer2);
 
         controls.setAlignment(Pos.CENTER);
 
         HBox currentSong = new HBox(10);
-        currentSong.setPadding(new Insets(0, 0, 0, 115));
+        currentSong.setPadding(new Insets(0, 25, 0, 115));
+
+        Canvas spectrum = new Canvas(100, 20);
+        player.setSpectrumCanvas(spectrum);
 
         currentSongName.setStyle("-fx-font-size: 16px;");
+        Region spacer3 = new Region();
+        HBox.setHgrow(spacer3, Priority.ALWAYS);
 
-        currentSong.getChildren().add(currentSongName);
+        currentSong.getChildren().addAll(currentSongName, spacer3, spectrum);
 
         Button prevButton = getButton(prevIcon, hoverPrevIcon);
         playPauseButton = isPlaying ? getButton(pauseIcon, hoverPauseIcon) : getButton(playIcon, hoverPlayIcon);
