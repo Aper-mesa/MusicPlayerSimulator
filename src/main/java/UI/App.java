@@ -12,6 +12,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -54,6 +55,7 @@ public class App extends Application {
     private static HBox noDownloadMessage;
     private static final ImageView album = new ImageView();
     private static final Label artistsLabel = new Label();
+    public static boolean isMute = false;
 
     @Override
     public void start(Stage primaryStage) {
@@ -99,6 +101,12 @@ public class App extends Application {
         Image singleIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/single.png")));
         Image hoverSingleIcon = new Image(
                 Objects.requireNonNull(getClass().getResourceAsStream("/icons/singleHover.png")));
+        Image volumeIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/volume.png")));
+        Image hoverVolumeIcon = new Image(
+                Objects.requireNonNull(getClass().getResourceAsStream("/icons/volumeHover.png")));
+        Image muteIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/mute.png")));
+        Image hoverMuteIcon = new Image(
+                Objects.requireNonNull(getClass().getResourceAsStream("/icons/muteHover.png")));
 
         Button downloadPageButton = new Button("Download");
         Button playPageButton = new Button("Play");
@@ -115,7 +123,26 @@ public class App extends Application {
         //font size of the warning
         warningLabel.setStyle("-fx-font-size: 16px;");
 
-        HBox topBar = new HBox(10, downloadPageButton, playPageButton, spacer, warningLabel);
+        Slider volumeBar = new Slider(0, 1, 1);
+        volumeBar.setPrefWidth(100);
+        VBox volumeContainer = new VBox(volumeBar);
+        volumeContainer.setAlignment(Pos.CENTER);
+        Button volumeButton = getButton(volumeIcon, hoverVolumeIcon, 15);
+
+        volumeBar.valueProperty().addListener(_ -> player.setVolume(volumeBar.getValue()));
+
+        volumeButton.setOnMouseClicked(_ -> {
+            if (isMute) {
+                isMute = false;
+                modifyButton(volumeIcon, hoverVolumeIcon, volumeButton, 15);
+            } else {
+                isMute = true;
+                modifyButton(muteIcon, hoverMuteIcon, volumeButton, 15);
+            }
+            player.setMute(isMute);
+        });
+
+        HBox topBar = new HBox(10, downloadPageButton, playPageButton, volumeButton, volumeContainer, spacer, warningLabel);
         topBar.setStyle("-fx-padding: 6; -fx-background-color: #ececec;");
 
         // the largest box, contains the album image and the player info
@@ -207,12 +234,14 @@ public class App extends Application {
 
         nextButton.setOnAction(_ -> {
             int index = player.playNext();
+            player.setMute(isMute);
             isPlaying = true;
             currentSongName.setText(playlist.get(index));
             modifyButton(pauseIcon, hoverPauseIcon, playPauseButton);
         });
         prevButton.setOnAction(_ -> {
             int index = player.playPrevious();
+            player.setMute(isMute);
             isPlaying = true;
             currentSongName.setText(playlist.get(index));
             modifyButton(pauseIcon, hoverPauseIcon, playPauseButton);
@@ -276,6 +305,7 @@ public class App extends Application {
             playButton.setOnAction(_ -> {
                 isPlaying = true;
                 player.playFromUI(finalI);
+                player.setMute(isMute);
                 modifyButton(pauseIcon, hoverPauseIcon, playPauseButton);
             });
 
@@ -388,26 +418,40 @@ public class App extends Application {
         return button;
     }
 
+    private static Button getButton(Image defaultIcon, Image hoverIcon, int size) {
+        Button button = new Button();
+        modifyButton(defaultIcon, hoverIcon, button, size);
+        return button;
+    }
+
     private static void modifyButton(Image defaultIcon, Image hoverIcon, Button button) {
+        modifyButtonCore(defaultIcon, hoverIcon, button, BUTTON_SIZE);
+    }
+
+    private static void modifyButton(Image defaultIcon, Image hoverIcon, Button button, int size) {
+        modifyButtonCore(defaultIcon, hoverIcon, button, size);
+    }
+
+    private static void modifyButtonCore(Image defaultIcon, Image hoverIcon, Button button, int size) {
         ImageView iconView = new ImageView(defaultIcon);
-        iconView.setFitWidth(BUTTON_SIZE);
-        iconView.setFitHeight(BUTTON_SIZE);
+        iconView.setFitWidth(size);
+        iconView.setFitHeight(size);
         iconView.setPreserveRatio(true);
         button.setGraphic(iconView);
         button.setStyle("-fx-background-color: transparent;");
 
         button.setOnMouseEntered(_ -> {
             ImageView hoverIconView = new ImageView(hoverIcon);
-            hoverIconView.setFitWidth(BUTTON_SIZE);
-            hoverIconView.setFitHeight(BUTTON_SIZE);
+            hoverIconView.setFitWidth(size);
+            hoverIconView.setFitHeight(size);
             hoverIconView.setPreserveRatio(true);
             button.setGraphic(hoverIconView);
             button.setCursor(Cursor.HAND);
         });
         button.setOnMouseExited(_ -> {
             ImageView defaultIconView = new ImageView(defaultIcon);
-            defaultIconView.setFitWidth(BUTTON_SIZE);
-            defaultIconView.setFitHeight(BUTTON_SIZE);
+            defaultIconView.setFitWidth(size);
+            defaultIconView.setFitHeight(size);
             defaultIconView.setPreserveRatio(true);
             button.setGraphic(defaultIconView);
             button.setCursor(Cursor.DEFAULT);

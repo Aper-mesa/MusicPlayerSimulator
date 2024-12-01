@@ -234,4 +234,16 @@ public class AudioPlayer {
                 mediaPlayer.getStatus() == MediaPlayer.Status.DISPOSED;
     }
 
+    public void setVolume(double volume) {
+        if (mediaPlayer != null) {
+            mediaPlayer.setVolume(volume);
+        }
+    }
+
+    public void setMute(boolean mute) {
+        if (mediaPlayer != null) {
+            mediaPlayer.setMute(mute);
+        }
+    }
+
 }
