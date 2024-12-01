@@ -131,6 +131,9 @@ public class App extends Application {
 
         volumeBar.valueProperty().addListener(_ -> player.setVolume(volumeBar.getValue()));
 
+        volumeBar.setOnMouseEntered(_ -> volumeBar.setCursor(Cursor.HAND));
+        volumeBar.setOnMouseExited(_ -> volumeBar.setCursor(Cursor.DEFAULT));
+
         volumeButton.setOnMouseClicked(_ -> {
             if (isMute) {
                 isMute = false;
