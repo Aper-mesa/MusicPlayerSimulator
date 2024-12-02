@@ -22,6 +22,7 @@ public class DownloadManager {
 
     // 启动下载任务 // Start the download task
     public void startDownload(int index) {
+        String taskId = playlist.get(index) + "-" + System.currentTimeMillis();  // 生成唯一 taskId
         String sourcePath = "./src/main/resources/songs/" + playlist.get(index);
         String userHome = System.getProperty("user.home");
         String destinationPath = userHome + "/Downloads/" + playlist.get(index);
@@ -47,7 +48,7 @@ public class DownloadManager {
         }
 
         // 创建任务对象
-        DownloadTask task = new DownloadTask(sourcePath, destinationPath, null);
+        DownloadTask task = new DownloadTask(sourcePath, destinationPath, null,taskId);
 
         // 创建回调并延迟绑定
         ProgressCallback callback = new ProgressCallback() {
@@ -105,21 +106,17 @@ public class DownloadManager {
     }
 
     // 移除下载任务 // Remove the download task (not yet used)
-    public void removeTask(int index) {
-        if (index < 0 || index >= taskList.size()) {
-            System.err.println("Invalid index: " + index);
-            App.updateWarning("Invalid index");
-            return;
+    public void removeTask(String taskId) {
+        for (DownloadTask task : taskList) {
+            if (task.getTaskId().equals(taskId)) {
+                taskList.remove(task);
+                System.out.println("Task with ID " + taskId + " has been removed.");
+                return;
+            }
         }
-
-        DownloadTask task = taskList.get(index);
-        if (task != null) {
-            task.cancel(); // 取消任务 // Cancel the task
-            taskList.remove(index); // 从列表中移除任务 // Remove the task from the list
-            System.out.println("Task at index " + index + " has been removed.");
-        }
-        if (taskList.isEmpty()) App.showNoDownloadMessage();
+        System.err.println("Task with ID " + taskId + " not found.");
     }
+
 
     // 调整下载速度 // Adjust the download speed
     public void setDownloadSpeed(int index, long speed) {
@@ -136,34 +133,30 @@ public class DownloadManager {
     }
 
     // 暂停任务 // Pause the task
-    public void pauseTask(int index) {
-        if (index < 0 || index >= taskList.size()) {
-            System.err.println("Invalid index: " + index);
-            App.updateWarning("Invalid index");
-            return;
+    public void pauseTask(String taskId) {
+        for (DownloadTask task : taskList) {
+            if (task.getTaskId().equals(taskId)) {
+                task.pause();
+                System.out.println("Task with ID " + taskId + " has been paused.");
+                return;
+            }
         }
-
-        DownloadTask task = taskList.get(index);
-        if (task != null) {
-            task.pause();
-            System.out.println("Task at index " + index + " has been paused.");
-        }
+        System.err.println("Task with ID " + taskId + " not found.");
     }
+
 
     // 恢复任务 // Resume the task
-    public void resumeTask(int index) {
-        if (index < 0 || index >= taskList.size()) {
-            System.err.println("Invalid index: " + index);
-            App.updateWarning("Invalid index");
-            return;
+    public void resumeTask(String taskId) {
+        for (DownloadTask task : taskList) {
+            if (task.getTaskId().equals(taskId)) {
+                task.resume();
+                System.out.println("Task with ID " + taskId + " has been resumed.");
+                return;
+            }
         }
-
-        DownloadTask task = taskList.get(index);
-        if (task != null) {
-            task.resume();
-            System.out.println("Task at index " + index + " has been resumed.");
-        }
+        System.err.println("Task with ID " + taskId + " not found.");
     }
+
 
     // 获取任务列表（仅用于调试或检查） // Get the task list (for debugging or inspection)
     public List<DownloadTask> getTaskList() {
