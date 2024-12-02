@@ -16,7 +16,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+/* AudioPlayer module use Two Classes to make the playing function works
+* AudioPlayer focus on Creating the Media Player Powered by JavaFX
+* Offers Playback mode management, Play, Pause, Up and Next Function
+* Realtime Progress Update
+* Realtime Audio Spectrum
+* Playlist Management Located at Playlist.java*/
+
 public class AudioPlayer {
+    //Initialize
     private MediaPlayer mediaPlayer;
     private final Playlist playlist;
     private Timeline proTimeline;
@@ -54,15 +62,18 @@ public class AudioPlayer {
         return playbackMode == CYCLE;
     }
 
+    //The Playback mode will use Playlist class to remanagement the Playlist, due to the Playback order is managed by the Playlist.java.
     public void setPlaybackMode(int mode) {
         this.playbackMode = mode;
         if (playbackMode == SHUFFLE) {
+            //Refresh the Playback Playlist and Shuffle Them
             playlist.saveCurrentTrackIndex();
             int currentTrackIndex = playlist.getCurrentTrackIndex();
             playlist.restorePlaylistOrder();
             playlist.selectTrackAndShuffle(currentTrackIndex);
             System.out.println("Shuffled playback mode activated.");
         } else if (playbackMode == CYCLE) {
+            //Refresh the Playback Playlist in the original Order
             String currentTrack = playlist.getCurrentTrack();
             playlist.restorePlaylistOrder();
             playlist.updateCurrentTrackIndexByName(currentTrack);
@@ -72,7 +83,7 @@ public class AudioPlayer {
             System.out.println("Single-track loop mode activated.");
         }
     }
-
+    // Get the trackpath, then play the songs. This will make a file check in playlist and then play.
     public void play(int index) {
         playlist.setCurrentTrackIndex(index);
         if (mediaPlayer != null) {
@@ -95,7 +106,7 @@ public class AudioPlayer {
                     }
                 });
                 mediaPlayer.setOnEndOfMedia(this::handleTrackEnd);
-
+                //after the songs stopped,
                 mediaPlayer.play();
             } else {
                 System.err.println("Track not found: " + trackPath);
@@ -104,7 +115,7 @@ public class AudioPlayer {
             System.err.println("Error loading track: " + e.getMessage());
         }
     }
-
+    //This is the Function from the UI, and identify if the playlist should be shuffle after.
     public void playFromUI(int uiIndex) {
         if (uiIndex < 0 || uiIndex >= playlist.getFilePlaylist().size()) {
             System.err.println("Invalid index from UI: " + uiIndex);
@@ -120,46 +131,32 @@ public class AudioPlayer {
         }
         play(playlist.getCurrentTrackIndex());
     }
-
+    //Simply use Media Player's play for resume.
     public void resume() {
         if (mediaPlayer != null) {
             mediaPlayer.play();
         }
     }
-
+    //Simply use Media Player's pause.
     public void pause() {
         if (mediaPlayer != null) {
             mediaPlayer.pause();
         }
     }
-
-    public void stop() {
-        if (mediaPlayer != null) {
-            mediaPlayer.stop();
-        }
-    }
-
+    //Use the playlist order for the next function
     public int playNext() {
         playlist.saveCurrentTrackIndex();
         playlist.nextTrack();
         play(playlist.getCurrentTrackIndex());
         return playlist.getCurrentTrackIndex();
     }
-
+    //Use the playlist order for the previous function
     public int playPrevious() {
         playlist.previousTrack();
         play(playlist.getCurrentTrackIndex());
         return playlist.getCurrentTrackIndex();
     }
-
-    public void restorePlaylistOrder() {
-        playlist.restorePlaylistOrder();
-    }
-
-    public void reloadFilePlaylist() {
-        playlist.reloadFilePlaylist();
-    }
-
+    //The AudioSpectrum are using the AudioSpectrum from JavaFX's Media Player.
     public void enableAudioSpectrum() {
         if (mediaPlayer != null && spectrumCanvas != null) {
             mediaPlayer.setAudioSpectrumInterval(1.0 / 60.0);
@@ -199,7 +196,7 @@ public class AudioPlayer {
         if (proTimeline != null) {
             proTimeline.stop();
         }
-        proTimeline = new Timeline(new KeyFrame(Duration.seconds(0.5), _ -> {
+        proTimeline = new Timeline(new KeyFrame(Duration.seconds(0.01), _ -> {
             if (mediaPlayer != null) {
                 Duration currentTime = mediaPlayer.getCurrentTime();
                 Duration totalDuration = mediaPlayer.getTotalDuration();
@@ -216,13 +213,14 @@ public class AudioPlayer {
         proTimeline.play();
     }
 
+    //Offer a way to jump to a point of the track according to the progress.
     public void jumpToProgress(double progress) {
         if (mediaPlayer != null && mediaPlayer.getTotalDuration() != null) {
             Duration totalDuration = mediaPlayer.getTotalDuration();
             mediaPlayer.seek(totalDuration.multiply(progress));
         }
     }
-
+    //When the song comming to end, automatically calls the play next.
     private void handleTrackEnd() {
         playNext();
     }
@@ -233,6 +231,7 @@ public class AudioPlayer {
                 mediaPlayer.getStatus() == MediaPlayer.Status.UNKNOWN ||
                 mediaPlayer.getStatus() == MediaPlayer.Status.DISPOSED;
     }
+
 
     public void setVolume(double volume) {
         if (mediaPlayer != null) {

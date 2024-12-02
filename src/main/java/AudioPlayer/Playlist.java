@@ -12,7 +12,7 @@ import java.net.URL;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
+//Use the ArrayList feature to store the Playlist.
 public class Playlist {
     private List<String> filePlaylist = new ArrayList<>();
     private ObservableList<String> playingPlaylist = FXCollections.observableArrayList();
@@ -25,7 +25,7 @@ public class Playlist {
         loadFilePlaylist();
         playingPlaylist.addAll(filePlaylist);
     }
-
+//Read the resource folder, load the playlist according to the file stored in the resource/songs/ playlist.
     private void loadFilePlaylist() {
         filePlaylist.clear();
         try (Stream<Path> files = Files.list(Paths.get("./src/main/resources/songs/"))) {
@@ -37,14 +37,11 @@ public class Playlist {
             System.out.println("Error reading the songs directory: " + e.getMessage());
         }
     }
-
+//return the playlist.
     public List<String> getFilePlaylist() {
         return filePlaylist;
     }
 
-    public List<String> getPlayingPlaylist() {
-        return playingPlaylist;
-    }
 
     public int getCurrentTrackIndex() {
         return currentTrackIndex;
@@ -131,6 +128,7 @@ public class Playlist {
         return playingPlaylist.get(currentTrackIndex);
     }
 
+    //
     public void updateCurrentTrackIndexByName(String trackName) {
         int index = getTrackIndexByName(trackName);
         if (index != -1) {
@@ -139,7 +137,7 @@ public class Playlist {
             System.err.println("Track not found in the playlist: " + trackName);
         }
     }
-
+    //Use the select Track and Shuffle, enable the shuffle playlist works as inspected.
     public void selectTrackAndShuffle(int trackIndex) {
         if (trackIndex >= 0 && trackIndex < filePlaylist.size()) {
             String selectedTrack = filePlaylist.get(trackIndex);
@@ -158,7 +156,7 @@ public class Playlist {
             currentTrackIndex = 0;
         }
     }
-
+//For Further Refresh
     public void reloadFilePlaylist() {
         loadFilePlaylist();
         playingPlaylist.clear();
