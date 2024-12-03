@@ -89,6 +89,7 @@ public class DownloadManager {
         Thread thread = new Thread(task);
         thread.setDaemon(true);
         thread.start();
+        App.updateWarning("Start download");
     }
 
     public void checkDownloadedFiles() {
