@@ -370,10 +370,8 @@ public class App extends Application {
     }
 
     public static void removeDownloadTask(String taskID) {
-        System.out.println("remove download row with name " + taskID);
         for (HBox downloadRow : downloadRows) {
             if (((Label) downloadRow.getChildren().get(1)).getText().equals(taskID)) {
-                System.out.println("found the row to remove");
                 downloadPage.getChildren().remove(downloadRow);
                 downloadRows.remove(downloadRow);
                 return;
@@ -402,7 +400,6 @@ public class App extends Application {
 
     public static void updateAlbum(Image cover, String name, Duration duration, String artists) {
         album.setImage(cover);
-        System.out.println(name);
         currentSongName.setText(name);
         artistsLabel.setText(artists);
 
