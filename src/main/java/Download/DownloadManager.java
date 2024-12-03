@@ -31,7 +31,7 @@ public class DownloadManager {
         checkDownloadedFiles();  // 清理已删除文件的路径
 
 
-        // 检查是否开始下载/禁止重复下载
+        // 检查是否开始下载/禁止重复下载//check if start download/avoid repeat download operation
         if (startedFiles.contains(taskId)) {
             System.out.println("This song is already downloading: " + taskId);
             App.updateWarning("This song is already downloading");
@@ -47,10 +47,10 @@ public class DownloadManager {
             return;
         }
 
-        // 创建任务对象
+        // 创建任务对象//creat task
         DownloadTask task = new DownloadTask(sourcePath, destinationPath, null,taskId);
 
-        // 创建回调并延迟绑定
+        // 创建回调并延迟绑定//callback
         ProgressCallback callback = new ProgressCallback() {
             @Override
             public void updateProgress(double progress) {
