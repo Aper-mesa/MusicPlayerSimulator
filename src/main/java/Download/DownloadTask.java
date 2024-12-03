@@ -18,6 +18,7 @@ public class DownloadTask implements Runnable {
         this.sourcePath = sourcePath;
         this.destinationPath = destinationPath;
         this.progressCallback = progressCallback;
+        this.taskId = taskId;
     }
     public String getTaskId() {
         return taskId;

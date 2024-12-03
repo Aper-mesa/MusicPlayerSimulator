@@ -22,18 +22,18 @@ public class DownloadManager {
 
     // 启动下载任务 // Start the download task
     public void startDownload(int index) {
-        String taskId = playlist.get(index) + "-" + System.currentTimeMillis();  // 生成唯一 taskId
-        String sourcePath = "./src/main/resources/songs/" + playlist.get(index);
+        String taskId = playlist.get(index);
+        String sourcePath = "./src/main/resources/songs/" + taskId;
         String userHome = System.getProperty("user.home");
-        String destinationPath = userHome + "/Downloads/" + playlist.get(index);
+        String destinationPath = userHome + "/Downloads/" + taskId;
 
         System.out.println("Current downloadedFiles: " + downloadedFiles);
         checkDownloadedFiles();  // 清理已删除文件的路径
 
 
         // 检查是否开始下载/禁止重复下载
-        if (startedFiles.contains(playlist.get(index))) {
-            System.out.println("This song is already downloading: " + playlist.get(index));
+        if (startedFiles.contains(taskId)) {
+            System.out.println("This song is already downloading: " + taskId);
             App.updateWarning("This song is already downloading");
             return;
         }
@@ -42,7 +42,7 @@ public class DownloadManager {
 
         System.out.println("2:After checkDownloadedFiles(), downloadedFiles: " + downloadedFiles);
         if (downloadedFiles.contains(destinationPath)) {
-            System.out.println("This song has already been downloaded: " + playlist.get(index));
+            System.out.println("This song has already been downloaded: " + taskId);
             App.updateWarning("This song has already been downloaded");
             return;
         }
@@ -109,6 +109,7 @@ public class DownloadManager {
     public void removeTask(String taskId) {
         for (DownloadTask task : taskList) {
             if (task.getTaskId().equals(taskId)) {
+                task.cancel();
                 taskList.remove(task);
                 System.out.println("Task with ID " + taskId + " has been removed.");
                 return;
