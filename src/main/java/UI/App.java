@@ -322,7 +322,7 @@ public class App extends Application {
         downloadPage.getChildren().remove(noDownloadMessage);
         final boolean[] isDownloading = {true};
         HBox downloadRow = new HBox(5);
-        downloadRows.add(downloadRow);
+
         downloadRow.setPrefHeight(50);
         downloadRow.setAlignment(Pos.CENTER_LEFT);
 
@@ -344,6 +344,8 @@ public class App extends Application {
         Button cancelButton = getButton(cancelIcon, hoverCancelIcon);
 
         downloadRow.getChildren().addAll(downloadNumber, songName, spacer, progressBar, pauseButton, cancelButton);
+        downloadRows.add(downloadRow);
+
         downloadPage.getChildren().add(downloadRow);
 
         downloadRow.setOnMouseEntered(_ -> downloadRow.setStyle("-fx-background-color: #ececec;"));
@@ -363,14 +365,20 @@ public class App extends Application {
 
         cancelButton.setOnAction(_ -> {
             dm.removeTask(playlist.get(index));
-            removeDownloadTask(downloadIndex);
+            removeDownloadTask(playlist.get(index));
         });
     }
 
-    public static void removeDownloadTask(int index) {
-        System.out.println("remove download row with index " + index);
-        downloadPage.getChildren().remove(downloadRows.get(index));
-        downloadRows.remove(index);
+    public static void removeDownloadTask(String taskID) {
+        System.out.println("remove download row with name " + taskID);
+        for (HBox downloadRow : downloadRows) {
+            if (((Label) downloadRow.getChildren().get(1)).getText().equals(taskID)) {
+                System.out.println("found the row to remove");
+                downloadPage.getChildren().remove(downloadRow);
+                downloadRows.remove(downloadRow);
+                return;
+            }
+        }
     }
 
     public static void showNoDownloadMessage() {

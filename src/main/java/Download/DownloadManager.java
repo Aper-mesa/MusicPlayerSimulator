@@ -70,7 +70,7 @@ public class DownloadManager {
             @Override
             public void onComplete() {
                 Platform.runLater(() -> {
-                    App.removeDownloadTask(taskList.indexOf(task));
+                    App.removeDownloadTask(task.getTaskId());
                     taskList.remove(task);
                     downloadedFiles.add(destinationPath); // 标记文件已下载
                     startedFiles.remove(playlist.get(index));
