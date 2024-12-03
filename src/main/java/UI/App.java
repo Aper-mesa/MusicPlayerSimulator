@@ -351,18 +351,18 @@ public class App extends Application {
 
         pauseButton.setOnAction(_ -> {
             if (isDownloading[0]) {
-                dm.pauseTask(downloadIndex);
+                dm.pauseTask(playlist.get(index));
                 modifyButton(playIcon, hoverPlayIcon, pauseButton);
                 isDownloading[0] = false;
             } else {
-                dm.resumeTask(downloadIndex);
+                dm.resumeTask(playlist.get(index));
                 modifyButton(pauseIcon, hoverPauseIcon, pauseButton);
                 isDownloading[0] = true;
             }
         });
 
         cancelButton.setOnAction(_ -> {
-            dm.removeTask(downloadIndex);
+            dm.removeTask(playlist.get(index));
             removeDownloadTask(downloadIndex);
         });
     }
