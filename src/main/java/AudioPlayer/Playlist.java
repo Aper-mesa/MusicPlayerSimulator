@@ -17,7 +17,6 @@ public class Playlist {
     private List<String> filePlaylist = new ArrayList<>();
     private ObservableList<String> playingPlaylist = FXCollections.observableArrayList();
 
-    private List<String> playingHistory = new ArrayList<>();
     private int currentTrackIndex = 0;
     private int savedCurrentTrackIndex = -1;
 
@@ -47,13 +46,6 @@ public class Playlist {
         return currentTrackIndex;
     }
 
-    public URL getTrackUrl(String trackName) throws Exception {
-        URL songURL = getClass().getResource("/songs/" + trackName);
-        if (songURL == null) {
-            throw new Exception("Track not found: " + trackName);
-        }
-        return songURL;
-    }
 
     public void setCurrentTrackIndex(int index) {
         if (index >= 0 && index < playingPlaylist.size()) {
@@ -61,9 +53,6 @@ public class Playlist {
         }
     }
 
-    public void addToHistory(String track) {
-        playingHistory.add(track);
-    }
 
     public void saveCurrentTrackIndex() {
         savedCurrentTrackIndex = currentTrackIndex;
@@ -156,10 +145,5 @@ public class Playlist {
             currentTrackIndex = 0;
         }
     }
-//For Further Refresh
-    public void reloadFilePlaylist() {
-        loadFilePlaylist();
-        playingPlaylist.clear();
-        playingPlaylist.addAll(filePlaylist);
-    }
+
 }

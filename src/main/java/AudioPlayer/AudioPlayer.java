@@ -94,9 +94,14 @@ public class AudioPlayer {
             URL resource = getClass().getResource(trackPath);
             if (resource != null) {
                 media = new Media(resource.toString());
+                long startTime = System.currentTimeMillis();
 
                 mediaPlayer = new MediaPlayer(media);
                 mediaPlayer.setOnReady(() -> {
+                    long endTime = System.currentTimeMillis();
+                    long elapsedTime = endTime - startTime;
+                    System.out.println("Track loaded and ready to play. Time elapsed: " + elapsedTime + " ms");
+
                     App.updateAlbum((Image) media.getMetadata().get("image"),
                             (String) media.getMetadata().get("title"),
                             media.getDuration(), (String) media.getMetadata().get("artist"));
