@@ -19,7 +19,6 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +26,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class App extends Application {
+    // some components are moved to member places since there are used across multiple methods
     private final static int BUTTON_SIZE = 25;
     private final static int PROGRESS_WIDTH = 475;
     private static final ProgressBar progressBar = new ProgressBar(0.0);
@@ -111,6 +111,7 @@ public class App extends Application {
         Button downloadPageButton = new Button("Download");
         Button playPageButton = new Button("Play");
 
+        //hovered cursor will turn to hand shape for better interaction
         downloadPageButton.setOnMouseEntered(_ -> downloadPageButton.setCursor(Cursor.HAND));
         playPageButton.setOnMouseEntered(_ -> playPageButton.setCursor(Cursor.HAND));
         downloadPageButton.setOnMouseExited(_ -> downloadPageButton.setCursor(Cursor.DEFAULT));
@@ -123,8 +124,10 @@ public class App extends Application {
         //font size of the warning
         warningLabel.setStyle("-fx-font-size: 16px;");
 
+        // volume control
         Slider volumeBar = new Slider(0, 1, 1);
         volumeBar.setPrefWidth(100);
+        // use a container to wrap the volume bar for better positioning
         VBox volumeContainer = new VBox(volumeBar);
         volumeContainer.setAlignment(Pos.CENTER);
         Button volumeButton = getButton(volumeIcon, hoverVolumeIcon, 15);
@@ -134,6 +137,7 @@ public class App extends Application {
         volumeBar.setOnMouseEntered(_ -> volumeBar.setCursor(Cursor.HAND));
         volumeBar.setOnMouseExited(_ -> volumeBar.setCursor(Cursor.DEFAULT));
 
+        //click the volume button to mute/unmute
         volumeButton.setOnMouseClicked(_ -> {
             if (isMute) {
                 isMute = false;
@@ -176,6 +180,7 @@ public class App extends Application {
         HBox currentSong = new HBox(10);
         currentSong.setPadding(new Insets(0, 25, 0, 115));
 
+        //audio visualization
         Canvas spectrum = new Canvas(100, 20);
         player.setSpectrumCanvas(spectrum);
 
@@ -185,11 +190,11 @@ public class App extends Application {
 
         currentSong.getChildren().addAll(currentSongName, spacer3, spectrum);
 
-        Button prevButton = getButton(prevIcon, hoverPrevIcon);
-        playPauseButton = isPlaying ? getButton(pauseIcon, hoverPauseIcon) : getButton(playIcon, hoverPlayIcon);
-        Button nextButton = getButton(nextIcon, hoverNextIcon);
+        Button prevButton = getButton(prevIcon, hoverPrevIcon, BUTTON_SIZE);
+        playPauseButton = isPlaying ? getButton(pauseIcon, hoverPauseIcon, BUTTON_SIZE) : getButton(playIcon, hoverPlayIcon, BUTTON_SIZE);
+        Button nextButton = getButton(nextIcon, hoverNextIcon, BUTTON_SIZE);
         player.setPlaybackMode(AudioPlayer.CYCLE);
-        modeButton = getButton(cycleIcon, hoverCycleIcon);
+        modeButton = getButton(cycleIcon, hoverCycleIcon, BUTTON_SIZE);
 
         artistsLabel.setPadding(new Insets(0, 0, 0, 115));
         artistsLabel.setTextFill(Color.GRAY);
@@ -211,6 +216,7 @@ public class App extends Application {
         downloadPageButton.setOnAction(_ -> root.setCenter(downloadPage));
         playPageButton.setOnAction(_ -> root.setCenter(playPage));
 
+        //click the progress bar to jump to any timeline of the song
         progressBar.setOnMouseClicked(e -> {
             if (player.noTrack()) return;
             double mouseX = e.getX();
@@ -250,6 +256,7 @@ public class App extends Application {
             modifyButton(pauseIcon, hoverPauseIcon, playPauseButton);
         });
 
+        //cycle mode, single mode, shuffle mode
         modeButton.setOnAction(_ -> {
             if (player.isCycle()) {
                 player.setPlaybackMode(AudioPlayer.SINGLE);
@@ -263,9 +270,7 @@ public class App extends Application {
             }
         });
 
-        album.setOnMouseClicked(_ -> {
-            System.out.println("album clicked");
-        });
+        album.setOnMouseClicked(_ -> System.out.println("album clicked"));
 
         album.setOnMouseEntered(_ -> album.setCursor(Cursor.HAND));
         album.setOnMouseExited(_ -> album.setCursor(Cursor.DEFAULT));
@@ -295,8 +300,8 @@ public class App extends Application {
             spacer.setMinWidth(Region.USE_COMPUTED_SIZE);
             HBox.setHgrow(spacer, Priority.ALWAYS);
 
-            Button playButton = getButton(playIcon, hoverPlayIcon);
-            Button downloadButton = getButton(downloadIcon, hoverDownloadIcon);
+            Button playButton = getButton(playIcon, hoverPlayIcon, BUTTON_SIZE);
+            Button downloadButton = getButton(downloadIcon, hoverDownloadIcon, BUTTON_SIZE);
 
             songRow.getChildren().addAll(songNumber, songName, spacer, playButton, downloadButton);
             playPage.getChildren().add(songRow);
@@ -305,6 +310,7 @@ public class App extends Application {
             songRow.setOnMouseExited(_ -> songRow.setStyle("-fx-background-color: transparent;"));
 
             int finalI = i;
+            //the play button on each row of a song
             playButton.setOnAction(_ -> {
                 isPlaying = true;
                 player.playFromUI(finalI);
@@ -340,8 +346,8 @@ public class App extends Application {
         ProgressBar progressBar = new ProgressBar(0.0);
         progressBar.setPrefWidth(200);
 
-        Button pauseButton = getButton(pauseIcon, hoverPauseIcon);
-        Button cancelButton = getButton(cancelIcon, hoverCancelIcon);
+        Button pauseButton = getButton(pauseIcon, hoverPauseIcon, BUTTON_SIZE);
+        Button cancelButton = getButton(cancelIcon, hoverCancelIcon, BUTTON_SIZE);
 
         downloadRow.getChildren().addAll(downloadNumber, songName, spacer, progressBar, pauseButton, cancelButton);
         downloadRows.add(downloadRow);
@@ -369,6 +375,7 @@ public class App extends Application {
         });
     }
 
+    //called by download manager to remove the download row in the gui
     public static void removeDownloadTask(String taskID) {
         for (HBox downloadRow : downloadRows) {
             if (((Label) downloadRow.getChildren().get(1)).getText().equals(taskID)) {
@@ -379,18 +386,22 @@ public class App extends Application {
         }
     }
 
+    //called when there is no download task
     public static void showNoDownloadMessage() {
         downloadPage.getChildren().add(noDownloadMessage);
     }
 
+    //called by the audio player to update to progress bar of the currently playing song
     public static void updatePlayProgress(double progress) {
         progressBar.setProgress(progress);
     }
 
+    //called by the download manager to update the progress bar of each download task
     public static void updateDownloadProgress(double progress, int index) {
         ((ProgressBar) downloadRows.get(index).getChildren().get(3)).setProgress(progress);
     }
 
+    //called when the program wants to warn the user
     public static void updateWarning(String warning) {
         warningLabel.setText(warning);
         PauseTransition pause = new PauseTransition(Duration.seconds(3));
@@ -398,6 +409,7 @@ public class App extends Application {
         pause.play();
     }
 
+    //update album cover when a new song is playing
     public static void updateAlbum(Image cover, String name, Duration duration, String artists) {
         album.setImage(cover);
         currentSongName.setText(name);
@@ -407,6 +419,7 @@ public class App extends Application {
         formatTime(duration, songDuration);
     }
 
+    //format seconds into minute: second
     private static void formatTime(Duration duration, Label label) {
         double totalSeconds = duration.toSeconds();
         long minutes = TimeUnit.SECONDS.toMinutes((long) totalSeconds);
@@ -415,23 +428,19 @@ public class App extends Application {
         label.setText(formattedDuration);
     }
 
+    //called each second to display the current time of the song
     public static void updateCurrentTime(Duration duration) {
         formatTime(duration, currentTimeLabel);
     }
 
-    @NotNull
-    private static Button getButton(Image defaultIcon, Image hoverIcon) {
-        Button button = new Button();
-        modifyButton(defaultIcon, hoverIcon, button);
-        return button;
-    }
-
+    //used to create and return a button
     private static Button getButton(Image defaultIcon, Image hoverIcon, int size) {
         Button button = new Button();
         modifyButton(defaultIcon, hoverIcon, button, size);
         return button;
     }
 
+    //used to change the icons of a button
     private static void modifyButton(Image defaultIcon, Image hoverIcon, Button button) {
         modifyButtonCore(defaultIcon, hoverIcon, button, BUTTON_SIZE);
     }
