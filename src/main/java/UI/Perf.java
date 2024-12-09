@@ -47,7 +47,7 @@ public class Perf {
 
         Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/perf.png")));
         perfStage = new Stage();
-        Scene scene = new Scene(root, 700, 900);
+        Scene scene = new Scene(root, 700, 850);
         perfStage.getIcons().add(icon);
 
         perfStage.setTitle("Performance");
