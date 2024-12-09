@@ -10,10 +10,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.Slider;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -33,6 +30,8 @@ public class App extends Application {
     private static final ProgressBar progressBar = new ProgressBar(0.0);
     private static final int ALBUM_SIZE = 113;
     private final VBox playPage = new VBox();
+    private final ScrollPane playPageScrollPane = new ScrollPane();
+    private final VBox playPageContent = new VBox();
     private static final VBox downloadPage = new VBox();
     private final BorderPane root = new BorderPane();
     private static List<String> playlist;
@@ -78,6 +77,8 @@ public class App extends Application {
 
         loadPlayPage();
 
+        root.setCenter(playPageScrollPane);
+
         Scene scene = new Scene(root, 700, 700);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
@@ -86,6 +87,14 @@ public class App extends Application {
 
     // load constant content of the player
     private void initContent() {
+        playPageScrollPane.setContent(playPageContent);
+        playPageScrollPane.setFitToWidth(true); // Makes the content fit the width of the scroll pane
+        playPageScrollPane.setStyle("-fx-background-color: transparent;"); // Optional: To match the background
+
+        playPageContent.setSpacing(5); // Add some spacing between songs
+        playPageContent.setPadding(new Insets(10)); // Optional: Add padding
+        playPageContent.setStyle("-fx-background-color: #f8f8f8;"); // Set a background color
+        root.setCenter(playPageScrollPane);
         Image prevIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/previous.png")));
         Image hoverPrevIcon = new Image(
                 Objects.requireNonNull(getClass().getResourceAsStream("/icons/previousHover.png")));
@@ -221,7 +230,7 @@ public class App extends Application {
         root.setBottom(bottomArea);
 
         downloadPageButton.setOnAction(_ -> root.setCenter(downloadPage));
-        playPageButton.setOnAction(_ -> root.setCenter(playPage));
+        playPageButton.setOnAction(_ -> root.setCenter(playPageScrollPane));
         perfPageButton.setOnAction(_ -> {
             Perf perf = new Perf();
             //这里有问题，不知道ownerStage从哪得到
@@ -322,7 +331,7 @@ public class App extends Application {
             Button downloadButton = getButton(downloadIcon, hoverDownloadIcon, BUTTON_SIZE);
 
             songRow.getChildren().addAll(songNumber, songName, spacer, playButton, downloadButton);
-            playPage.getChildren().add(songRow);
+            playPageContent.getChildren().add(songRow);
 
             songRow.setOnMouseEntered(_ -> songRow.setStyle("-fx-background-color: #ececec;"));
             songRow.setOnMouseExited(_ -> songRow.setStyle("-fx-background-color: transparent;"));
