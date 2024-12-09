@@ -44,8 +44,11 @@ public class AudioPlayer {
 
     private ScheduledExecutorService memoryMonitorExecutor;
 
+    private final Perf perf;
+
     public AudioPlayer() {
         playlist = new Playlist();
+        perf = new Perf();
         startMemoryMonitoring();
     }
 
@@ -115,7 +118,8 @@ public class AudioPlayer {
                 mediaPlayer.setOnReady(() -> {
                     long endTime = System.currentTimeMillis();
                     long elapsedTime = endTime - startTime;
-                    System.out.println("Track loaded and ready to play. Time elapsed: " + elapsedTime + " ms");
+                    String currentTrackName = playlist.getCurrentTrack();
+                    perf.updateSongOpenTime(index+1, elapsedTime / 1000.0);
 
                     App.updateAlbum((Image) media.getMetadata().get("image"),
                             (String) media.getMetadata().get("title"),
@@ -127,7 +131,6 @@ public class AudioPlayer {
                     logMemoryUsage();
                 });
                 mediaPlayer.setOnEndOfMedia(this::handleTrackEnd);
-                //after the songs stopped,
                 mediaPlayer.play();
             } else {
                 System.err.println("Track not found: " + trackPath);
@@ -136,6 +139,7 @@ public class AudioPlayer {
             System.err.println("Error loading track: " + e.getMessage());
         }
     }
+
 
     //This is the Function from the UI, and identify if the playlist should be shuffle after.
     public void playFromUI(int uiIndex) {
