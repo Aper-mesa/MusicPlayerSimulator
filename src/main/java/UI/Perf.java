@@ -39,6 +39,7 @@ public class Perf {
     private NumberAxis xAxis;
     private NumberAxis yAxis;
 
+
     public void start(Stage ownerStage) {
         if (perfStage != null) {
             perfStage.toFront();
@@ -104,6 +105,15 @@ public class Perf {
         yAxis.setLowerBound(0);
         yAxis.setUpperBound(100); // Initialize to 0-100, will adjust dynamically later
     }
+
+    public void initializeSongData(int playListSize) {
+        songTimeData.clear();
+        for (int i = 1; i <= playListSize; i++) {
+            songTimeData.put(i, 0.0);
+        }
+        updateSongTimeChart();
+    }
+
 
     private void setupSongTimeChart() {
         CategoryAxis xSongAxis = new CategoryAxis();
@@ -193,11 +203,11 @@ public class Perf {
 
     private static void updateSongTimeChart() {
         songTimeSeries.getData().clear();
-
         songTimeData.forEach((index, openTime) -> {
             songTimeSeries.getData().add(new XYChart.Data<>(String.valueOf(index), openTime)); // Use index as the label
         });
     }
+
 
     public static void closeWindow() {
         if (perfStage != null) {

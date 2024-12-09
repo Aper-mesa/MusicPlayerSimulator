@@ -49,6 +49,7 @@ public class AudioPlayer {
     public AudioPlayer() {
         playlist = new Playlist();
         perf = new Perf();
+        perf.initializeSongData(playlist.getFilePlaylist().size());
         startMemoryMonitoring();
     }
 
@@ -315,6 +316,9 @@ public class AudioPlayer {
         if (mediaPlayer != null) {
             mediaPlayer.setMute(mute);
         }
+    }
+    public int getPlaylistSize() {
+        return playlist.getFilePlaylist().size();
     }
 
 }
