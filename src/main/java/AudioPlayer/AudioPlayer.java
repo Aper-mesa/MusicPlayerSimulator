@@ -106,6 +106,13 @@ public class AudioPlayer {
         playlist.setCurrentTrackIndex(index);
         if (mediaPlayer != null) {
             mediaPlayer.stop();
+            mediaPlayer.dispose();
+            mediaPlayer = null;
+            if (proTimeline != null) {
+                proTimeline.stop();
+                proTimeline.getKeyFrames().clear();
+            }
+            System.gc();
         }
         try {
             String trackPath = "/songs/" + playlist.getCurrentTrack();
@@ -118,7 +125,6 @@ public class AudioPlayer {
                 mediaPlayer.setOnReady(() -> {
                     long endTime = System.currentTimeMillis();
                     long elapsedTime = endTime - startTime;
-                    String currentTrackName = playlist.getCurrentTrack();
                     perf.updateSongOpenTime(index+1, elapsedTime / 1000.0);
 
                     App.updateAlbum((Image) media.getMetadata().get("image"),
@@ -174,22 +180,38 @@ public class AudioPlayer {
 
     //Use the playlist order for the next function
     public int playNext() {
+        // Stop and dispose the old media player
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer.dispose();
+            mediaPlayer = null;
+            System.gc();  // Request garbage collection to free memory
+        }
         playlist.saveCurrentTrackIndex();
         playlist.nextTrack();
         play(playlist.getCurrentTrackIndex());
         return playlist.getCurrentTrackIndex();
     }
 
-    //Use the playlist order for the previous function
     public int playPrevious() {
+        // Stop and dispose the old media player
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer.dispose();
+            mediaPlayer = null;
+            System.gc();  // Request garbage collection to free memory
+        }
         playlist.previousTrack();
         play(playlist.getCurrentTrackIndex());
         return playlist.getCurrentTrackIndex();
     }
 
+
+
     //The AudioSpectrum are using the AudioSpectrum from JavaFX Media Player.
     public void enableAudioSpectrum() {
         if (mediaPlayer != null && spectrumCanvas != null) {
+            magnitudeQueue.clear();
             mediaPlayer.setAudioSpectrumInterval(1.0 / 60.0);
             mediaPlayer.setAudioSpectrumNumBands(20);
             mediaPlayer.setAudioSpectrumThreshold(-60);

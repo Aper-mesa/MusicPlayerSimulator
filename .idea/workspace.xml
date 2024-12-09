@@ -5,15 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="98d3255a-1d00-49c5-9850-296761bb8e99" name="Changes" comment="Add new Player with FX. Code later">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/AudioPlayer/AudioPlayer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/AudioPlayer/AudioPlayer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/UI/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/UI/App.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/songs/Blossom &amp; Moonlight (2024 Demo).m4a" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/songs/Dissonant Harmony.wav" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/songs/Half Moon.mp3" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/songs/Harmonious Dissonance.wav" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/songs/WoG2大桥颂歌（Apermesa个人版）.mp3" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/songs/[DEMO] The Cinder.mp3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/songs/Spontaneous Overflew  自然流露.mp3" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,17 +26,17 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
-    &quot;lastFilter&quot;: {
+  &quot;lastFilter&quot;: {
     &quot;state&quot;: &quot;OPEN&quot;,
     &quot;assignee&quot;: &quot;zensomnia&quot;
-    }
-    }</component>
+  }
+}</component>
   <component name="GithubPullRequestsUISettings">{
-    &quot;selectedUrlAndAccountId&quot;: {
+  &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/Aper-mesa/MusicPlayerSimulator.git&quot;,
-    &quot;accountId&quot;: &quot;12603304-701a-42dd-a8e5-fa0911c0d96b&quot;
-    }
-    }</component>
+    &quot;accountId&quot;: &quot;9b958365-de30-4143-bf47-758c9ec5e10e&quot;
+  }
+}</component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -60,44 +55,47 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.APFXTest.executor": "Run",
-    "Application.App.executor": "Run",
-    "Application.AudioPlayer.executor": "Run",
-    "Application.CustomLayout.executor": "Run",
-    "Application.HelloApplication.executor": "Run",
-    "Application.Player.executor": "Run",
-    "Application.Test.executor": "Run",
-    "Notification.DisplayName-DoNotAsk-Maven": "Maven",
-    "Notification.DoNotAsk-Maven": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "extract.method.default.visibility": "private",
-    "git-widget-placeholder": "new1",
-    "ignore.virus.scanning.warn.message": "true",
-    "kotlin-language-version-configured": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "preferences.lookFeel",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.APFXTest.executor&quot;: &quot;Run&quot;,
+    &quot;Application.App.executor&quot;: &quot;Run&quot;,
+    &quot;Application.AudioPlayer.executor&quot;: &quot;Run&quot;,
+    &quot;Application.CustomLayout.executor&quot;: &quot;Run&quot;,
+    &quot;Application.HelloApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Player.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Test.executor&quot;: &quot;Run&quot;,
+    &quot;Notification.DisplayName-DoNotAsk-Maven&quot;: &quot;Maven&quot;,
+    &quot;Notification.DoNotAsk-Maven&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;extract.method.default.visibility&quot;: &quot;private&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;new1&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;,
+    &quot;应用程序.App.executor&quot;: &quot;Run&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Apermesa\IdeaProjects\MusicPlayerSimulator\src\main\resources\songs" />
       <recent name="C:\Users\Apermesa\IdeaProjects\MusicPlayerSimulator\src\main\java" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.App">
+  <component name="RunManager" selected="应用程序.App">
     <configuration name="App" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="ALTERNATIVE_JRE_PATH" value="openjdk-22" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
       <option name="MAIN_CLASS_NAME" value="UI.App" />
       <module name="MusicPlayerSimulator" />
       <extension name="coverage">
@@ -163,27 +161,23 @@
       </method>
     </configuration>
     <list>
-      <item itemvalue="Application.CustomLayout" />
-      <item itemvalue="Application.Test" />
-      <item itemvalue="Application.AudioPlayer" />
-      <item itemvalue="Application.Player" />
-      <item itemvalue="Application.App" />
+      <item itemvalue="应用程序.App" />
+      <item itemvalue="应用程序.AudioPlayer" />
+      <item itemvalue="应用程序.CustomLayout" />
+      <item itemvalue="应用程序.Player" />
+      <item itemvalue="应用程序.Test" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.App" />
-        <item itemvalue="Application.CustomLayout" />
-        <item itemvalue="Application.Test" />
-        <item itemvalue="Application.Player" />
-        <item itemvalue="Application.AudioPlayer" />
+        <item itemvalue="应用程序.App" />
       </list>
     </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-fdfe4dae3a2d-intellij.indexing.shared.core-IU-243.21565.193" />
-        <option value="bundled-js-predefined-d6986cc7102b-e768b9ed790e-JavaScript-IU-243.21565.193" />
+        <option value="bundled-jdk-9823dce3aa75-28b599e66164-intellij.indexing.shared.core-IU-242.23726.103" />
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-IU-242.23726.103" />
       </set>
     </attachedChunks>
   </component>
@@ -211,6 +205,8 @@
       <workItem from="1732712447485" duration="592000" />
       <workItem from="1732754218016" duration="1735000" />
       <workItem from="1732774843638" duration="12261000" />
+      <workItem from="1733074212653" duration="698000" />
+      <workItem from="1733761009818" duration="1566000" />
     </task>
     <servers />
   </component>
