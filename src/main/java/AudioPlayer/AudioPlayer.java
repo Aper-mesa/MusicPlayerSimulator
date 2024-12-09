@@ -16,6 +16,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 /* AudioPlayer module use Two Classes to make the playing function works
 * AudioPlayer focus on Creating the Media Player Powered by JavaFX
 * Offers Playback mode management, Play, Pause, Up and Next Function
@@ -38,8 +42,11 @@ public class AudioPlayer {
     private static final int DELAY_FRAMES = 3;
     private final Queue<float[]> magnitudeQueue = new LinkedList<>();
 
+    private ScheduledExecutorService memoryMonitorExecutor;
+
     public AudioPlayer() {
         playlist = new Playlist();
+        startMemoryMonitoring();
     }
 
     public List<String> getPlaylist() {
@@ -109,6 +116,7 @@ public class AudioPlayer {
                     if (spectrumCanvas != null) {
                         enableAudioSpectrum();
                     }
+                    logMemoryUsage();
                 });
                 mediaPlayer.setOnEndOfMedia(this::handleTrackEnd);
                 //after the songs stopped,
@@ -216,6 +224,21 @@ public class AudioPlayer {
         }));
         proTimeline.setCycleCount(Timeline.INDEFINITE);
         proTimeline.play();
+    }
+    private void startMemoryMonitoring() {
+        memoryMonitorExecutor = Executors.newScheduledThreadPool(1);
+        memoryMonitorExecutor.scheduleAtFixedRate(() -> {
+            long usedMemory = getUsedMemory();
+            System.out.println("Memory Used: " + usedMemory + " MB");
+        }, 0, 5, TimeUnit.SECONDS);
+    }
+    private long getUsedMemory() {
+        Runtime runtime = Runtime.getRuntime();
+        return (runtime.totalMemory() - runtime.freeMemory()) / (1024 * 1024); // 转换为MB
+    }
+    private void logMemoryUsage() {
+        long usedMemory = getUsedMemory();
+        System.out.println("Memory Used After Operation: " + usedMemory + " MB");
     }
 
     //Offer a way to jump to a point of the track according to the progress.
