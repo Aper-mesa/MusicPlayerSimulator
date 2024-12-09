@@ -244,13 +244,13 @@ public class AudioPlayer {
         memoryMonitorExecutor = Executors.newScheduledThreadPool(1);
         memoryMonitorExecutor.scheduleAtFixedRate(() -> {
             long usedMemory = getUsedMemory();
-            Platform.runLater(() -> Perf.updateMemoryUsage(usedMemory + " KB"));
-        }, 0, 1000, TimeUnit.MICROSECONDS); // memory usage updates in every 0.5 sec
+            Platform.runLater(() -> Perf.updateMemoryUsage(usedMemory + " MB"));
+        }, 0, 1, TimeUnit.SECONDS); // memory usage updates in every 0.5 sec
     }
 
     private long getUsedMemory() {
         Runtime runtime = Runtime.getRuntime();
-        return (runtime.totalMemory() - runtime.freeMemory()) / 1024; // 转换为KB
+        return (runtime.totalMemory() - runtime.freeMemory()) / (1024 * 1024); // 转换为KB
     }
 
     private void logMemoryUsage() {
@@ -266,7 +266,7 @@ public class AudioPlayer {
         }
     }
 
-    //When the song comming to end, automatically calls the play next.
+    //When the song coming to end, automatically calls the play next.
     private void handleTrackEnd() {
         playNext();
     }

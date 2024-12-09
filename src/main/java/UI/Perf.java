@@ -38,7 +38,7 @@ public class Perf {
 
         Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/perf.png")));
         perfStage = new Stage();
-        Scene scene = new Scene(root, 700, 600);
+        Scene scene = new Scene(root, 700, 900);
         perfStage.getIcons().add(icon);
 
         perfStage.setTitle("Performance");
@@ -101,7 +101,7 @@ public class Perf {
             public void run() {
                 updateMemoryChart();
             }
-        }, 0, 500);
+        }, 0, 1000);
     }
 
     private void updateMemoryChart() {
@@ -118,12 +118,10 @@ public class Perf {
             }
 
             if (memorySeries.getData().size() > MAX_DATA_POINTS) {
-                memorySeries.getData().remove(0);
+                memorySeries.getData().removeFirst();
             }
             
             time++;
-
-            updateMemoryUsage(usedMemory + " MB");
         });
     }
 
