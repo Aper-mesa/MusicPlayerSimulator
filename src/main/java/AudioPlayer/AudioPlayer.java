@@ -1,6 +1,7 @@
 package AudioPlayer;
 
 import UI.App;
+import UI.Perf;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -15,17 +16,16 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /* AudioPlayer module use Two Classes to make the playing function works
-* AudioPlayer focus on Creating the Media Player Powered by JavaFX
-* Offers Playback mode management, Play, Pause, Up and Next Function
-* Realtime Progress Update
-* Realtime Audio Spectrum
-* Playlist Management Located at Playlist.java*/
+ * AudioPlayer focus on Creating the Media Player Powered by JavaFX
+ * Offers Playback mode management, Play, Pause, Up and Next Function
+ * Realtime Progress Update
+ * Realtime Audio Spectrum
+ * Playlist Management Located at Playlist.java*/
 
 public class AudioPlayer {
     //Initialize
@@ -49,6 +49,13 @@ public class AudioPlayer {
         startMemoryMonitoring();
     }
 
+    public void shutdownMemoryMonitor() {
+        if (memoryMonitorExecutor != null) {
+            memoryMonitorExecutor.shutdownNow();
+            memoryMonitorExecutor = null;
+        }
+    }
+
     public List<String> getPlaylist() {
         return playlist.getFilePlaylist();
     }
@@ -69,7 +76,7 @@ public class AudioPlayer {
         return playbackMode == CYCLE;
     }
 
-    //The Playback mode will use Playlist class to remanagement the Playlist, due to the Playback order is managed by the Playlist.java.
+    //The Playback mode will use Playlist class to re-manage the Playlist, due to the Playback order is managed by the Playlist.java.
     public void setPlaybackMode(int mode) {
         this.playbackMode = mode;
         if (playbackMode == SHUFFLE) {
@@ -90,7 +97,8 @@ public class AudioPlayer {
             System.out.println("Single-track loop mode activated.");
         }
     }
-    // Get the trackpath, then play the songs. This will make a file check in playlist and then play.
+
+    // Get the track path, then play the songs. This will make a file check in playlist and then play.
     public void play(int index) {
         playlist.setCurrentTrackIndex(index);
         if (mediaPlayer != null) {
@@ -128,6 +136,7 @@ public class AudioPlayer {
             System.err.println("Error loading track: " + e.getMessage());
         }
     }
+
     //This is the Function from the UI, and identify if the playlist should be shuffle after.
     public void playFromUI(int uiIndex) {
         if (uiIndex < 0 || uiIndex >= playlist.getFilePlaylist().size()) {
@@ -144,18 +153,21 @@ public class AudioPlayer {
         }
         play(playlist.getCurrentTrackIndex());
     }
+
     //Simply use Media Player's play for resume.
     public void resume() {
         if (mediaPlayer != null) {
             mediaPlayer.play();
         }
     }
+
     //Simply use Media Player's pause.
     public void pause() {
         if (mediaPlayer != null) {
             mediaPlayer.pause();
         }
     }
+
     //Use the playlist order for the next function
     public int playNext() {
         playlist.saveCurrentTrackIndex();
@@ -163,13 +175,15 @@ public class AudioPlayer {
         play(playlist.getCurrentTrackIndex());
         return playlist.getCurrentTrackIndex();
     }
+
     //Use the playlist order for the previous function
     public int playPrevious() {
         playlist.previousTrack();
         play(playlist.getCurrentTrackIndex());
         return playlist.getCurrentTrackIndex();
     }
-    //The AudioSpectrum are using the AudioSpectrum from JavaFX's Media Player.
+
+    //The AudioSpectrum are using the AudioSpectrum from JavaFX Media Player.
     public void enableAudioSpectrum() {
         if (mediaPlayer != null && spectrumCanvas != null) {
             mediaPlayer.setAudioSpectrumInterval(1.0 / 60.0);
@@ -225,17 +239,20 @@ public class AudioPlayer {
         proTimeline.setCycleCount(Timeline.INDEFINITE);
         proTimeline.play();
     }
+
     private void startMemoryMonitoring() {
         memoryMonitorExecutor = Executors.newScheduledThreadPool(1);
         memoryMonitorExecutor.scheduleAtFixedRate(() -> {
             long usedMemory = getUsedMemory();
-            System.out.println("Memory Used: " + usedMemory + " MB");
-        }, 0, 5, TimeUnit.SECONDS);
+            Platform.runLater(() -> Perf.updateMemoryUsage(usedMemory + " KB"));
+        }, 0, 1000, TimeUnit.MICROSECONDS); // memory usage updates in every 0.5 sec
     }
+
     private long getUsedMemory() {
         Runtime runtime = Runtime.getRuntime();
-        return (runtime.totalMemory() - runtime.freeMemory()) / (1024 * 1024); // 转换为MB
+        return (runtime.totalMemory() - runtime.freeMemory()) / 1024; // 转换为KB
     }
+
     private void logMemoryUsage() {
         long usedMemory = getUsedMemory();
         System.out.println("Memory Used After Operation: " + usedMemory + " MB");
@@ -248,6 +265,7 @@ public class AudioPlayer {
             mediaPlayer.seek(totalDuration.multiply(progress));
         }
     }
+
     //When the song comming to end, automatically calls the play next.
     private void handleTrackEnd() {
         playNext();

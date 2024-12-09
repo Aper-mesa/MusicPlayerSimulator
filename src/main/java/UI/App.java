@@ -4,6 +4,7 @@ import AudioPlayer.AudioPlayer;
 import Download.DownloadManager;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -56,10 +57,13 @@ public class App extends Application {
     private static final ImageView album = new ImageView();
     private static final Label artistsLabel = new Label();
     public static boolean isMute = false;
+    private Stage primaryStage;
 
     @Override
     public void start(Stage primaryStage) {
+        this.primaryStage = primaryStage;
         playlist = player.getPlaylist();
+        System.out.println("playlist size: " + playlist.size());
         primaryStage.setTitle("Music Player Simulator");
         Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/play.png")));
         primaryStage.getIcons().add(icon);
@@ -110,12 +114,15 @@ public class App extends Application {
 
         Button downloadPageButton = new Button("Download");
         Button playPageButton = new Button("Play");
+        Button perfPageButton = new Button("Performance");
 
         //hovered cursor will turn to hand shape for better interaction
         downloadPageButton.setOnMouseEntered(_ -> downloadPageButton.setCursor(Cursor.HAND));
         playPageButton.setOnMouseEntered(_ -> playPageButton.setCursor(Cursor.HAND));
         downloadPageButton.setOnMouseExited(_ -> downloadPageButton.setCursor(Cursor.DEFAULT));
         playPageButton.setOnMouseExited(_ -> playPageButton.setCursor(Cursor.DEFAULT));
+        perfPageButton.setOnMouseEntered(_ -> perfPageButton.setCursor(Cursor.HAND));
+        perfPageButton.setOnMouseExited(_ -> perfPageButton.setCursor(Cursor.DEFAULT));
 
         // use a spacer to make the warning on the right side
         Region spacer = new Region();
@@ -149,7 +156,7 @@ public class App extends Application {
             player.setMute(isMute);
         });
 
-        HBox topBar = new HBox(10, downloadPageButton, playPageButton, volumeButton, volumeContainer, spacer, warningLabel);
+        HBox topBar = new HBox(10, downloadPageButton, playPageButton, perfPageButton, volumeButton, volumeContainer, spacer, warningLabel);
         topBar.setStyle("-fx-padding: 6; -fx-background-color: #ececec;");
 
         // the largest box, contains the album image and the player info
@@ -215,6 +222,11 @@ public class App extends Application {
 
         downloadPageButton.setOnAction(_ -> root.setCenter(downloadPage));
         playPageButton.setOnAction(_ -> root.setCenter(playPage));
+        perfPageButton.setOnAction(_ -> {
+            Perf perf = new Perf();
+            //这里有问题，不知道ownerStage从哪得到
+            perf.start(primaryStage);
+        });
 
         //click the progress bar to jump to any timeline of the song
         progressBar.setOnMouseClicked(e -> {
@@ -274,6 +286,12 @@ public class App extends Application {
 
         album.setOnMouseEntered(_ -> album.setCursor(Cursor.HAND));
         album.setOnMouseExited(_ -> album.setCursor(Cursor.DEFAULT));
+
+        primaryStage.setOnCloseRequest(_ -> {
+            System.out.println("stage close");
+            player.shutdownMemoryMonitor();
+            Platform.exit(); // 确保所有JavaFX线程都停止
+        });
     }
 
     private void loadPlayPage() {
