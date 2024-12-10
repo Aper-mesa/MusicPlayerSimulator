@@ -2,43 +2,55 @@ package UI;
 
 import javafx.application.Platform;
 import javafx.scene.Scene;
-import javafx.scene.chart.BarChart;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
+import javafx.scene.chart.*;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 public class Perf {
-    private final VBox root = new VBox(10);
-
+    private static final int MAX_DATA_POINTS = 50;
+    private static final int RIGHT_MARGIN = 10;
+    // Store song open time data by index (1-based index)
+    private static final Map<Integer, Double> songTimeData = new HashMap<>(); // Store index and open time
+    private static final XYChart.Series<String, Number> songTimeSeries = new XYChart.Series<>(); // For displaying data on the chart
+    private static final Label memoryUsage = new Label("-");
     // Static variable to track the window instance
     private static Stage perfStage = null;
-
+    private final VBox root = new VBox(10);
     // Store memory usage data
     private final XYChart.Series<Number, Number> memorySeries = new XYChart.Series<>();
     private int time = 0;
-    private static final int MAX_DATA_POINTS = 50;
-    private static final int RIGHT_MARGIN = 10;
-
-    // Store song open time data by index (1-based index)
-    private static Map<Integer, Double> songTimeData = new HashMap<>(); // Store index and open time
-    private static XYChart.Series<String, Number> songTimeSeries = new XYChart.Series<>(); // For displaying data on the chart
-
     // Define chart axes
     private NumberAxis xAxis;
     private NumberAxis yAxis;
 
+    public static void updateMemoryUsage(String value) {
+        memoryUsage.setText(value);
+    }
+
+    public static void updateSongOpenTime(int index, double elapsedTimeInSeconds) {
+        songTimeData.put(index, elapsedTimeInSeconds);
+
+        updateSongTimeChart();
+    }
+
+    private static void updateSongTimeChart() {
+        songTimeSeries.getData().clear();
+        songTimeData.forEach((index, openTime) -> {
+            songTimeSeries.getData().add(new XYChart.Data<>(String.valueOf(index), openTime)); // Use index as the label
+        });
+    }
+
+    public static void closeWindow() {
+        if (perfStage != null) {
+            perfStage.close();
+            perfStage = null;
+        }
+    }
 
     public void start(Stage ownerStage) {
         if (perfStage != null) {
@@ -70,8 +82,6 @@ public class Perf {
 
         startPerformanceUpdater();
     }
-
-    private static final Label memoryUsage = new Label("-");
 
     private void memory() {
         Label memoryLabel = new Label("Music player memory usage: ");
@@ -114,7 +124,6 @@ public class Perf {
         updateSongTimeChart();
     }
 
-
     private void setupSongTimeChart() {
         CategoryAxis xSongAxis = new CategoryAxis();
         NumberAxis ySongAxis = new NumberAxis();
@@ -128,10 +137,6 @@ public class Perf {
         songTimeChart.setLegendVisible(false);
 
         root.getChildren().add(songTimeChart);
-    }
-
-    public static void updateMemoryUsage(String value) {
-        memoryUsage.setText(value);
     }
 
     private void startPerformanceUpdater() {
@@ -150,11 +155,10 @@ public class Perf {
 
         Platform.runLater(() -> {
             memorySeries.getData().add(new XYChart.Data<>(time, usedMemory));
-            
-            if (memorySeries.getData().size() > MAX_DATA_POINTS) {
-                memorySeries.getData().remove(0);
-            }
 
+            if (memorySeries.getData().size() > MAX_DATA_POINTS) {
+                memorySeries.getData().removeFirst();
+            }
 
             adjustYAxis();
 
@@ -166,7 +170,6 @@ public class Perf {
             time++;
         });
     }
-
 
     private void adjustYAxis() {
         double maxMemory = memorySeries.getData().stream()
@@ -186,33 +189,10 @@ public class Perf {
         yAxis.setUpperBound(upperBound);
     }
 
-
     private void initializeSongData() {
         for (int i = 1; i <= 8; i++) {
             songTimeData.put(i, 0.0);
         }
         updateSongTimeChart();
-    }
-
-
-    public static void updateSongOpenTime(int index, double elapsedTimeInSeconds) {
-        songTimeData.put(index, elapsedTimeInSeconds);
-
-        updateSongTimeChart();
-    }
-
-    private static void updateSongTimeChart() {
-        songTimeSeries.getData().clear();
-        songTimeData.forEach((index, openTime) -> {
-            songTimeSeries.getData().add(new XYChart.Data<>(String.valueOf(index), openTime)); // Use index as the label
-        });
-    }
-
-
-    public static void closeWindow() {
-        if (perfStage != null) {
-            perfStage.close();
-            perfStage = null;
-        }
     }
 }

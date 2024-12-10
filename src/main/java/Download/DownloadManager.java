@@ -48,7 +48,7 @@ public class DownloadManager {
         }
 
         // 创建任务对象//creat task
-        DownloadTask task = new DownloadTask(sourcePath, destinationPath, null,taskId);
+        DownloadTask task = new DownloadTask(sourcePath, destinationPath, null, taskId);
 
         // 创建回调并延迟绑定//callback
         ProgressCallback callback = new ProgressCallback() {

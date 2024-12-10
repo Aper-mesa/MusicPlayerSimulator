@@ -5,24 +5,26 @@ import UI.App;
 import java.io.*;
 
 public class DownloadTask implements Runnable {
-    private String taskId;  // 唯一标识任务
+    private final String taskId;  // 唯一标识任务
     private final String sourcePath; // 源文件路径 // Source file path
     private final String destinationPath; // 目标文件路径 // Destination file path
+    private final Object lock = new Object(); // 用于暂停和取消的锁 // Lock for pause and cancel synchronization
     private volatile boolean isPaused = false; // 是否暂停 // Whether the task is paused
     private volatile boolean isCancelled = false; // 是否取消 // Whether the task is cancelled
     private ProgressCallback progressCallback; // 进度回调接口 // Progress callback interface
-    private final Object lock = new Object(); // 用于暂停和取消的锁 // Lock for pause and cancel synchronization
     private volatile long speed = 1024 * 100; // 下载速度（字节/秒），这里可以限制下载速度大小 // Download speed (bytes/second), can limit download speed
 
-    public DownloadTask(String sourcePath, String destinationPath, ProgressCallback progressCallback,String taskId) {
+    public DownloadTask(String sourcePath, String destinationPath, ProgressCallback progressCallback, String taskId) {
         this.sourcePath = sourcePath;
         this.destinationPath = destinationPath;
         this.progressCallback = progressCallback;
         this.taskId = taskId;
     }
+
     public String getTaskId() {
         return taskId;
     }
+
     //用于设置动态回调 // For setting a dynamic callback
     public void setProgressCallback(ProgressCallback progressCallback) {
         this.progressCallback = progressCallback;
@@ -147,10 +149,5 @@ public class DownloadTask implements Runnable {
     // 设置下载速度 // Set download speed
     public void setSpeed(long speed) {
         this.speed = speed;
-    }
-
-    // 获取当前速度 // Get current speed
-    public long getSpeed() {
-        return speed;
     }
 }

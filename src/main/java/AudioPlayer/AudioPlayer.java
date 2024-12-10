@@ -28,36 +28,24 @@ import java.util.concurrent.TimeUnit;
  * Playlist Management Located at Playlist.java*/
 
 public class AudioPlayer {
+    public static final int CYCLE = 0;
+    public static final int SHUFFLE = 1;
+    public static final int SINGLE = 2;
+    private static final int DELAY_FRAMES = 3;
+    private final Playlist playlist;
+    private final Queue<float[]> magnitudeQueue = new LinkedList<>();
     //Initialize
     private MediaPlayer mediaPlayer;
-    private final Playlist playlist;
     private Timeline proTimeline;
     private Media media;
     private Canvas spectrumCanvas;
     private int playbackMode = 0;
-    public static final int CYCLE = 0;
-    public static final int SHUFFLE = 1;
-    public static final int SINGLE = 2;
-
-    private static final int DELAY_FRAMES = 3;
-    private final Queue<float[]> magnitudeQueue = new LinkedList<>();
-
-    private ScheduledExecutorService memoryMonitorExecutor;
-
-    private final Perf perf;
 
     public AudioPlayer() {
         playlist = new Playlist();
-        perf = new Perf();
+        Perf perf = new Perf();
         perf.initializeSongData(playlist.getFilePlaylist().size());
         startMemoryMonitoring();
-    }
-
-    public void shutdownMemoryMonitor() {
-        if (memoryMonitorExecutor != null) {
-            memoryMonitorExecutor.shutdownNow();
-            memoryMonitorExecutor = null;
-        }
     }
 
     public List<String> getPlaylist() {
@@ -126,7 +114,7 @@ public class AudioPlayer {
                 mediaPlayer.setOnReady(() -> {
                     long endTime = System.currentTimeMillis();
                     long elapsedTime = endTime - startTime;
-                    perf.updateSongOpenTime(index+1, elapsedTime / 1000.0);
+                    Perf.updateSongOpenTime(index + 1, elapsedTime / 1000.0);
 
                     App.updateAlbum((Image) media.getMetadata().get("image"),
                             (String) media.getMetadata().get("title"),
@@ -147,8 +135,7 @@ public class AudioPlayer {
         }
     }
 
-
-    //This is the Function from the UI, and identify if the playlist should be shuffle after.
+    //This is the Function from the UI, and identify if the playlist should be shuffled after.
     public void playFromUI(int uiIndex) {
         if (uiIndex < 0 || uiIndex >= playlist.getFilePlaylist().size()) {
             System.err.println("Invalid index from UI: " + uiIndex);
@@ -207,8 +194,6 @@ public class AudioPlayer {
         return playlist.getCurrentTrackIndex();
     }
 
-
-
     //The AudioSpectrum are using the AudioSpectrum from JavaFX Media Player.
     public void enableAudioSpectrum() {
         if (mediaPlayer != null && spectrumCanvas != null) {
@@ -218,7 +203,7 @@ public class AudioPlayer {
             mediaPlayer.setAudioSpectrumThreshold(-60);
 
             GraphicsContext gc = spectrumCanvas.getGraphicsContext2D();
-            mediaPlayer.setAudioSpectrumListener((timestamp, duration, magnitudes, phases) -> {
+            mediaPlayer.setAudioSpectrumListener((_, _, magnitudes, _) -> {
 
                 float[] magnitudesCopy = new float[magnitudes.length];
                 System.arraycopy(magnitudes, 0, magnitudesCopy, 0, magnitudes.length);
@@ -268,7 +253,7 @@ public class AudioPlayer {
     }
 
     private void startMemoryMonitoring() {
-        memoryMonitorExecutor = Executors.newScheduledThreadPool(1);
+        ScheduledExecutorService memoryMonitorExecutor = Executors.newScheduledThreadPool(1);
         memoryMonitorExecutor.scheduleAtFixedRate(() -> {
             long usedMemory = getUsedMemory();
             Platform.runLater(() -> Perf.updateMemoryUsage(usedMemory + " MB"));
@@ -305,7 +290,6 @@ public class AudioPlayer {
                 mediaPlayer.getStatus() == MediaPlayer.Status.DISPOSED;
     }
 
-
     public void setVolume(double volume) {
         if (mediaPlayer != null) {
             mediaPlayer.setVolume(volume);
@@ -317,8 +301,4 @@ public class AudioPlayer {
             mediaPlayer.setMute(mute);
         }
     }
-    public int getPlaylistSize() {
-        return playlist.getFilePlaylist().size();
-    }
-
 }

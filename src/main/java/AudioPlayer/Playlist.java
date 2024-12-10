@@ -1,5 +1,8 @@
 package AudioPlayer;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -8,14 +11,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
-import java.net.URL;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 //Use the ArrayList feature to store the Playlist.
 public class Playlist {
-    private List<String> filePlaylist = new ArrayList<>();
-    private ObservableList<String> playingPlaylist = FXCollections.observableArrayList();
+    private final List<String> filePlaylist = new ArrayList<>();
+    private final ObservableList<String> playingPlaylist = FXCollections.observableArrayList();
 
     private int currentTrackIndex = 0;
     private int savedCurrentTrackIndex = -1;
@@ -24,7 +24,8 @@ public class Playlist {
         loadFilePlaylist();
         playingPlaylist.addAll(filePlaylist);
     }
-//Read the resource folder, load the playlist according to the file stored in the resource/songs/ playlist.
+
+    //Read the resource folder, load the playlist according to the file stored in the resource/songs/ playlist.
     private void loadFilePlaylist() {
         filePlaylist.clear();
         try (Stream<Path> files = Files.list(Paths.get("./src/main/resources/songs/"))) {
@@ -36,7 +37,8 @@ public class Playlist {
             System.out.println("Error reading the songs directory: " + e.getMessage());
         }
     }
-//return the playlist.
+
+    //return the playlist.
     public List<String> getFilePlaylist() {
         return filePlaylist;
     }
@@ -126,6 +128,7 @@ public class Playlist {
             System.err.println("Track not found in the playlist: " + trackName);
         }
     }
+
     //Use the select Track and Shuffle, enable the shuffle playlist works as inspected.
     public void selectTrackAndShuffle(int trackIndex) {
         if (trackIndex >= 0 && trackIndex < filePlaylist.size()) {

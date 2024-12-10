@@ -1,4 +1,5 @@
 package Download;
+
 //接口方法的具体实现
 public class ConsoleProgressCallback implements ProgressCallback {
     @Override

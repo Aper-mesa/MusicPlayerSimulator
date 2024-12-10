@@ -4,7 +4,6 @@ import AudioPlayer.AudioPlayer;
 import Download.DownloadManager;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -29,17 +28,9 @@ public class App extends Application {
     private final static int PROGRESS_WIDTH = 475;
     private static final ProgressBar progressBar = new ProgressBar(0.0);
     private static final int ALBUM_SIZE = 113;
-    private final VBox playPage = new VBox();
-    private final ScrollPane playPageScrollPane = new ScrollPane();
-    private final VBox playPageContent = new VBox();
     private static final VBox downloadPage = new VBox();
-    private final BorderPane root = new BorderPane();
-    private static List<String> playlist;
-    private final AudioPlayer player = new AudioPlayer();
     private static final DownloadManager dm = new DownloadManager();
     private static final Label currentSongName = new Label();
-    private Button playPauseButton;
-    private static Button modeButton;
     private static final Image pauseIcon = new Image(Objects.requireNonNull(App.class.getResourceAsStream("/icons/pause.png")));
     private static final Image hoverPauseIcon = new Image(Objects.requireNonNull(App.class.getResourceAsStream("/icons/pauseHover.png")));
     private static final Image playIcon = new Image(Objects.requireNonNull(App.class.getResourceAsStream("/icons/play.png")));
@@ -47,16 +38,180 @@ public class App extends Application {
     private static final Image cancelIcon = new Image(Objects.requireNonNull(App.class.getResourceAsStream("/icons/cancel.png")));
     private static final Image hoverCancelIcon = new Image(
             Objects.requireNonNull(App.class.getResourceAsStream("/icons/cancelHover.png")));
-    private boolean isPlaying = false;
     private static final Label currentTimeLabel = new Label("00: 00");
     private static final Label songDuration = new Label("00: 00");
     private static final List<HBox> downloadRows = new ArrayList<>();
     private static final Label warningLabel = new Label();
-    private static HBox noDownloadMessage;
     private static final ImageView album = new ImageView();
     private static final Label artistsLabel = new Label();
     public static boolean isMute = false;
+    private static List<String> playlist;
+    private static Button modeButton;
+    private static HBox noDownloadMessage;
+    private final VBox playPage = new VBox();
+    private final ScrollPane playPageScrollPane = new ScrollPane();
+    private final VBox playPageContent = new VBox();
+    private final BorderPane root = new BorderPane();
+    private final AudioPlayer player = new AudioPlayer();
+    private Button playPauseButton;
+    private boolean isPlaying = false;
     private Stage primaryStage;
+
+    //create a new download row in the download page
+    public static void addDownloadRow(int index, int downloadIndex) {
+        downloadPage.getChildren().remove(noDownloadMessage);
+        final boolean[] isDownloading = {true};
+        HBox downloadRow = new HBox(5);
+
+        downloadRow.setPrefHeight(50);
+        downloadRow.setAlignment(Pos.CENTER_LEFT);
+
+        Label downloadNumber = new Label("   " + (downloadIndex + 1));
+        downloadNumber.setPrefWidth(50);
+        downloadNumber.setStyle("-fx-font-size: 16px;");
+
+        Label songName = new Label(playlist.get(index));
+        songName.setStyle("-fx-font-size: 16px;");
+
+        Region spacer = new Region();
+        spacer.setMinWidth(Region.USE_COMPUTED_SIZE);
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        ProgressBar progressBar = new ProgressBar(0.0);
+        progressBar.setPrefWidth(200);
+
+        Button pauseButton = getButton(pauseIcon, hoverPauseIcon, BUTTON_SIZE);
+        Button cancelButton = getButton(cancelIcon, hoverCancelIcon, BUTTON_SIZE);
+
+        downloadRow.getChildren().addAll(downloadNumber, songName, spacer, progressBar, pauseButton, cancelButton);
+        downloadRows.add(downloadRow);
+
+        downloadPage.getChildren().add(downloadRow);
+
+        downloadRow.setOnMouseEntered(_ -> downloadRow.setStyle("-fx-background-color: #ececec;"));
+        downloadRow.setOnMouseExited(_ -> downloadRow.setStyle("-fx-background-color: transparent;"));
+
+        pauseButton.setOnAction(_ -> {
+            if (isDownloading[0]) {
+                dm.pauseTask(playlist.get(index));
+                modifyButton(playIcon, hoverPlayIcon, pauseButton);
+                isDownloading[0] = false;
+            } else {
+                dm.resumeTask(playlist.get(index));
+                modifyButton(pauseIcon, hoverPauseIcon, pauseButton);
+                isDownloading[0] = true;
+            }
+        });
+
+        cancelButton.setOnAction(_ -> {
+            dm.removeTask(playlist.get(index));
+            removeDownloadTask(playlist.get(index));
+        });
+    }
+
+    //called by download manager to remove the download row in the gui
+    public static void removeDownloadTask(String taskID) {
+        for (HBox downloadRow : downloadRows) {
+            if (((Label) downloadRow.getChildren().get(1)).getText().equals(taskID)) {
+                downloadPage.getChildren().remove(downloadRow);
+                downloadRows.remove(downloadRow);
+                return;
+            }
+        }
+    }
+
+    //called when there is no download task
+    public static void showNoDownloadMessage() {
+        downloadPage.getChildren().add(noDownloadMessage);
+    }
+
+    //called by the audio player to update to progress bar of the currently playing song
+    public static void updatePlayProgress(double progress) {
+        progressBar.setProgress(progress);
+    }
+
+    //called by the download manager to update the progress bar of each download task
+    public static void updateDownloadProgress(double progress, int index) {
+        ((ProgressBar) downloadRows.get(index).getChildren().get(3)).setProgress(progress);
+    }
+
+    //called when the program wants to warn the user
+    public static void updateWarning(String warning) {
+        warningLabel.setText(warning);
+        PauseTransition pause = new PauseTransition(Duration.seconds(3));
+        pause.setOnFinished(_ -> warningLabel.setText(""));
+        pause.play();
+    }
+
+    //update album cover when a new song is playing
+    public static void updateAlbum(Image cover, String name, Duration duration, String artists) {
+        album.setImage(cover);
+        currentSongName.setText(name);
+        artistsLabel.setText(artists);
+
+        // display song duration
+        formatTime(duration, songDuration);
+    }
+
+    //format seconds into minute: second
+    private static void formatTime(Duration duration, Label label) {
+        double totalSeconds = duration.toSeconds();
+        long minutes = TimeUnit.SECONDS.toMinutes((long) totalSeconds);
+        long seconds = (long) totalSeconds - TimeUnit.MINUTES.toSeconds(minutes);
+        String formattedDuration = String.format("%02d: %02d", minutes, seconds);
+        label.setText(formattedDuration);
+    }
+
+    //called each second to display the current time of the song
+    public static void updateCurrentTime(Duration duration) {
+        formatTime(duration, currentTimeLabel);
+    }
+
+    //used to create and return a button
+    private static Button getButton(Image defaultIcon, Image hoverIcon, int size) {
+        Button button = new Button();
+        modifyButton(defaultIcon, hoverIcon, button, size);
+        return button;
+    }
+
+    //used to change the icons of a button
+    private static void modifyButton(Image defaultIcon, Image hoverIcon, Button button) {
+        modifyButtonCore(defaultIcon, hoverIcon, button, BUTTON_SIZE);
+    }
+
+    private static void modifyButton(Image defaultIcon, Image hoverIcon, Button button, int size) {
+        modifyButtonCore(defaultIcon, hoverIcon, button, size);
+    }
+
+    private static void modifyButtonCore(Image defaultIcon, Image hoverIcon, Button button, int size) {
+        ImageView iconView = new ImageView(defaultIcon);
+        iconView.setFitWidth(size);
+        iconView.setFitHeight(size);
+        iconView.setPreserveRatio(true);
+        button.setGraphic(iconView);
+        button.setStyle("-fx-background-color: transparent;");
+
+        button.setOnMouseEntered(_ -> {
+            ImageView hoverIconView = new ImageView(hoverIcon);
+            hoverIconView.setFitWidth(size);
+            hoverIconView.setFitHeight(size);
+            hoverIconView.setPreserveRatio(true);
+            button.setGraphic(hoverIconView);
+            button.setCursor(Cursor.HAND);
+        });
+        button.setOnMouseExited(_ -> {
+            ImageView defaultIconView = new ImageView(defaultIcon);
+            defaultIconView.setFitWidth(size);
+            defaultIconView.setFitHeight(size);
+            defaultIconView.setPreserveRatio(true);
+            button.setGraphic(defaultIconView);
+            button.setCursor(Cursor.DEFAULT);
+        });
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
 
     @Override
     public void start(Stage primaryStage) {
@@ -233,7 +388,6 @@ public class App extends Application {
         playPageButton.setOnAction(_ -> root.setCenter(playPageScrollPane));
         perfPageButton.setOnAction(_ -> {
             Perf perf = new Perf();
-            //这里有问题，不知道ownerStage从哪得到
             perf.start(primaryStage);
         });
 
@@ -295,12 +449,6 @@ public class App extends Application {
 
         album.setOnMouseEntered(_ -> album.setCursor(Cursor.HAND));
         album.setOnMouseExited(_ -> album.setCursor(Cursor.DEFAULT));
-
-        primaryStage.setOnCloseRequest(_ -> {
-            System.out.println("stage close");
-            player.shutdownMemoryMonitor();
-            Platform.exit(); // 确保所有JavaFX线程都停止
-        });
     }
 
     private void loadPlayPage() {
@@ -348,161 +496,5 @@ public class App extends Application {
             // create a download task
             downloadButton.setOnAction(_ -> dm.startDownload(finalI));
         }
-    }
-
-    //create a new download row in the download page
-    public static void addDownloadRow(int index, int downloadIndex) {
-        downloadPage.getChildren().remove(noDownloadMessage);
-        final boolean[] isDownloading = {true};
-        HBox downloadRow = new HBox(5);
-
-        downloadRow.setPrefHeight(50);
-        downloadRow.setAlignment(Pos.CENTER_LEFT);
-
-        Label downloadNumber = new Label("   " + (downloadIndex + 1));
-        downloadNumber.setPrefWidth(50);
-        downloadNumber.setStyle("-fx-font-size: 16px;");
-
-        Label songName = new Label(playlist.get(index));
-        songName.setStyle("-fx-font-size: 16px;");
-
-        Region spacer = new Region();
-        spacer.setMinWidth(Region.USE_COMPUTED_SIZE);
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        ProgressBar progressBar = new ProgressBar(0.0);
-        progressBar.setPrefWidth(200);
-
-        Button pauseButton = getButton(pauseIcon, hoverPauseIcon, BUTTON_SIZE);
-        Button cancelButton = getButton(cancelIcon, hoverCancelIcon, BUTTON_SIZE);
-
-        downloadRow.getChildren().addAll(downloadNumber, songName, spacer, progressBar, pauseButton, cancelButton);
-        downloadRows.add(downloadRow);
-
-        downloadPage.getChildren().add(downloadRow);
-
-        downloadRow.setOnMouseEntered(_ -> downloadRow.setStyle("-fx-background-color: #ececec;"));
-        downloadRow.setOnMouseExited(_ -> downloadRow.setStyle("-fx-background-color: transparent;"));
-
-        pauseButton.setOnAction(_ -> {
-            if (isDownloading[0]) {
-                dm.pauseTask(playlist.get(index));
-                modifyButton(playIcon, hoverPlayIcon, pauseButton);
-                isDownloading[0] = false;
-            } else {
-                dm.resumeTask(playlist.get(index));
-                modifyButton(pauseIcon, hoverPauseIcon, pauseButton);
-                isDownloading[0] = true;
-            }
-        });
-
-        cancelButton.setOnAction(_ -> {
-            dm.removeTask(playlist.get(index));
-            removeDownloadTask(playlist.get(index));
-        });
-    }
-
-    //called by download manager to remove the download row in the gui
-    public static void removeDownloadTask(String taskID) {
-        for (HBox downloadRow : downloadRows) {
-            if (((Label) downloadRow.getChildren().get(1)).getText().equals(taskID)) {
-                downloadPage.getChildren().remove(downloadRow);
-                downloadRows.remove(downloadRow);
-                return;
-            }
-        }
-    }
-
-    //called when there is no download task
-    public static void showNoDownloadMessage() {
-        downloadPage.getChildren().add(noDownloadMessage);
-    }
-
-    //called by the audio player to update to progress bar of the currently playing song
-    public static void updatePlayProgress(double progress) {
-        progressBar.setProgress(progress);
-    }
-
-    //called by the download manager to update the progress bar of each download task
-    public static void updateDownloadProgress(double progress, int index) {
-        ((ProgressBar) downloadRows.get(index).getChildren().get(3)).setProgress(progress);
-    }
-
-    //called when the program wants to warn the user
-    public static void updateWarning(String warning) {
-        warningLabel.setText(warning);
-        PauseTransition pause = new PauseTransition(Duration.seconds(3));
-        pause.setOnFinished(_ -> warningLabel.setText(""));
-        pause.play();
-    }
-
-    //update album cover when a new song is playing
-    public static void updateAlbum(Image cover, String name, Duration duration, String artists) {
-        album.setImage(cover);
-        currentSongName.setText(name);
-        artistsLabel.setText(artists);
-
-        // display song duration
-        formatTime(duration, songDuration);
-    }
-
-    //format seconds into minute: second
-    private static void formatTime(Duration duration, Label label) {
-        double totalSeconds = duration.toSeconds();
-        long minutes = TimeUnit.SECONDS.toMinutes((long) totalSeconds);
-        long seconds = (long) totalSeconds - TimeUnit.MINUTES.toSeconds(minutes);
-        String formattedDuration = String.format("%02d: %02d", minutes, seconds);
-        label.setText(formattedDuration);
-    }
-
-    //called each second to display the current time of the song
-    public static void updateCurrentTime(Duration duration) {
-        formatTime(duration, currentTimeLabel);
-    }
-
-    //used to create and return a button
-    private static Button getButton(Image defaultIcon, Image hoverIcon, int size) {
-        Button button = new Button();
-        modifyButton(defaultIcon, hoverIcon, button, size);
-        return button;
-    }
-
-    //used to change the icons of a button
-    private static void modifyButton(Image defaultIcon, Image hoverIcon, Button button) {
-        modifyButtonCore(defaultIcon, hoverIcon, button, BUTTON_SIZE);
-    }
-
-    private static void modifyButton(Image defaultIcon, Image hoverIcon, Button button, int size) {
-        modifyButtonCore(defaultIcon, hoverIcon, button, size);
-    }
-
-    private static void modifyButtonCore(Image defaultIcon, Image hoverIcon, Button button, int size) {
-        ImageView iconView = new ImageView(defaultIcon);
-        iconView.setFitWidth(size);
-        iconView.setFitHeight(size);
-        iconView.setPreserveRatio(true);
-        button.setGraphic(iconView);
-        button.setStyle("-fx-background-color: transparent;");
-
-        button.setOnMouseEntered(_ -> {
-            ImageView hoverIconView = new ImageView(hoverIcon);
-            hoverIconView.setFitWidth(size);
-            hoverIconView.setFitHeight(size);
-            hoverIconView.setPreserveRatio(true);
-            button.setGraphic(hoverIconView);
-            button.setCursor(Cursor.HAND);
-        });
-        button.setOnMouseExited(_ -> {
-            ImageView defaultIconView = new ImageView(defaultIcon);
-            defaultIconView.setFitWidth(size);
-            defaultIconView.setFitHeight(size);
-            defaultIconView.setPreserveRatio(true);
-            button.setGraphic(defaultIconView);
-            button.setCursor(Cursor.DEFAULT);
-        });
-    }
-
-    public static void main(String[] args) {
-        launch(args);
     }
 }
