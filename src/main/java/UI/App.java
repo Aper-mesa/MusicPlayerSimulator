@@ -246,8 +246,6 @@ public class App extends Application {
         playPageScrollPane.setFitToWidth(true); // Makes the content fit the width of the scroll pane
         playPageScrollPane.setStyle("-fx-background-color: transparent;"); // Optional: To match the background
 
-        playPageContent.setSpacing(5); // Add some spacing between songs
-        playPageContent.setPadding(new Insets(10)); // Optional: Add padding
         playPageContent.setStyle("-fx-background-color: #f8f8f8;"); // Set a background color
         root.setCenter(playPageScrollPane);
         Image prevIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/previous.png")));
@@ -444,11 +442,6 @@ public class App extends Application {
                 modifyButton(cycleIcon, hoverCycleIcon, modeButton);
             }
         });
-
-        album.setOnMouseClicked(_ -> System.out.println("album clicked"));
-
-        album.setOnMouseEntered(_ -> album.setCursor(Cursor.HAND));
-        album.setOnMouseExited(_ -> album.setCursor(Cursor.DEFAULT));
     }
 
     private void loadPlayPage() {
