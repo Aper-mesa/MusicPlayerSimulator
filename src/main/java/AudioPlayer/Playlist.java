@@ -136,7 +136,7 @@ public class Playlist {
 
             List<String> shuffledList = new ArrayList<>(filePlaylist);
             shuffledList.remove(selectedTrack);
-            shuffledList.add(0, selectedTrack);
+            shuffledList.addFirst(selectedTrack);
 
             List<String> remainingTracks = shuffledList.subList(1, shuffledList.size());
             Collections.shuffle(remainingTracks);

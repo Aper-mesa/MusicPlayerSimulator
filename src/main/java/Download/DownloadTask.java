@@ -12,7 +12,6 @@ public class DownloadTask implements Runnable {
     private volatile boolean isPaused = false; // 是否暂停 // Whether the task is paused
     private volatile boolean isCancelled = false; // 是否取消 // Whether the task is cancelled
     private ProgressCallback progressCallback; // 进度回调接口 // Progress callback interface
-    private volatile long speed = 1024 * 100; // 下载速度（字节/秒），这里可以限制下载速度大小 // Download speed (bytes/second), can limit download speed
 
     public DownloadTask(String sourcePath, String destinationPath, ProgressCallback progressCallback, String taskId) {
         this.sourcePath = sourcePath;
@@ -87,6 +86,8 @@ public class DownloadTask implements Runnable {
 
                 // 3. 控制下载速度 // 3. Control download speed
                 synchronized (lock) {
+                    // 下载速度（字节/秒），这里可以限制下载速度大小 // Download speed (bytes/second), can limit download speed
+                    long speed = 1024 * 100;
                     if (bytesDownloadedThisSecond >= speed) {
                         long currentTime = System.currentTimeMillis();
                         long timeElapsed = currentTime - lastTime;
@@ -144,10 +145,5 @@ public class DownloadTask implements Runnable {
             isCancelled = true;
             lock.notifyAll();
         }
-    }
-
-    // 设置下载速度 // Set download speed
-    public void setSpeed(long speed) {
-        this.speed = speed;
     }
 }

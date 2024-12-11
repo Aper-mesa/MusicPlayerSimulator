@@ -100,7 +100,7 @@ public class DownloadManager {
             File file = new File(filePath);
             if (!file.exists()) {
                 filesToRemove.add(filePath); // 如果文件不存在，添加到移除列表//if file not exist, add to arraylist "filesToRemove"
-                System.out.println("removelist" + filesToRemove);
+                System.out.println("remove list" + filesToRemove);
             }
         }
         downloadedFiles.removeAll(filesToRemove); // 从下载记录中移除这些文件//remove file from downloadFiles
@@ -117,21 +117,6 @@ public class DownloadManager {
             }
         }
         System.err.println("Task with ID " + taskId + " not found.");
-    }
-
-
-    // 调整下载速度 // Adjust the download speed
-    public void setDownloadSpeed(int index, long speed) {
-        if (index < 0 || index >= taskList.size()) {
-            System.err.println("Invalid index: " + index);
-            return;
-        }
-
-        DownloadTask task = taskList.get(index);
-        if (task != null) {
-            task.setSpeed(speed); // 调整任务速度 // Adjust the task speed
-            System.out.println("Speed for task " + index + " set to " + speed + " bytes/second.");
-        }
     }
 
     // 暂停任务 // Pause the task
@@ -157,11 +142,5 @@ public class DownloadManager {
             }
         }
         System.err.println("Task with ID " + taskId + " not found.");
-    }
-
-
-    // 获取任务列表（仅用于调试或检查） // Get the task list (for debugging or inspection)
-    public List<DownloadTask> getTaskList() {
-        return taskList;
     }
 }
