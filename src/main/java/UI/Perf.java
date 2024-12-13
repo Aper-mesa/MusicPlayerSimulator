@@ -28,16 +28,19 @@ public class Perf {
     private NumberAxis xAxis;
     private NumberAxis yAxis;
 
+    // Updates the displayed memory usage.
     public static void updateMemoryUsage(String value) {
         memoryUsage.setText(value);
     }
 
+    // Updates the song open time for a specific song index and refreshes the chart
     public static void updateSongOpenTime(int index, double elapsedTimeInSeconds) {
         songTimeData.put(index, elapsedTimeInSeconds);
 
         updateSongTimeChart();
     }
 
+    // Refreshes the song open time chart with the current data
     private static void updateSongTimeChart() {
         songTimeSeries.getData().clear();
         songTimeData.forEach((index, openTime) -> {
@@ -45,6 +48,7 @@ public class Perf {
         });
     }
 
+    // Closes the performance window if it is open
     public static void closeWindow() {
         if (perfStage != null) {
             perfStage.close();
@@ -58,6 +62,7 @@ public class Perf {
             return;
         }
 
+        // Create the performance window
         Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/perf.png")));
         perfStage = new Stage();
         Scene scene = new Scene(root, 700, 850);
@@ -69,7 +74,7 @@ public class Perf {
 
         perfStage.initOwner(ownerStage);
 
-        // Set close event listener
+        // Set close event listener to handle close event
         perfStage.setOnCloseRequest(_ -> closeWindow());
 
         memory();
@@ -78,11 +83,10 @@ public class Perf {
 
         perfStage.show();
 
-        initializeSongData();
-
         startPerformanceUpdater();
     }
 
+    // Adds memory usage label to the UI
     private void memory() {
         Label memoryLabel = new Label("Music player memory usage: ");
         memoryLabel.setStyle("-fx-font-size: 16px;");
@@ -107,6 +111,7 @@ public class Perf {
 
         root.getChildren().add(lineChart);
 
+        // Configure initial chart bounds
         xAxis.setAutoRanging(false);
         xAxis.setLowerBound(0);
         xAxis.setUpperBound(MAX_DATA_POINTS + RIGHT_MARGIN);
@@ -116,6 +121,7 @@ public class Perf {
         yAxis.setUpperBound(100); // Initialize to 0-100, will adjust dynamically later
     }
 
+    // Initializes song open time data with a given playlist size
     public void initializeSongData(int playListSize) {
         songTimeData.clear();
         for (int i = 1; i <= playListSize; i++) {
@@ -124,6 +130,7 @@ public class Perf {
         updateSongTimeChart();
     }
 
+    // Configures the bar chart to display song open times
     private void setupSongTimeChart() {
         CategoryAxis xSongAxis = new CategoryAxis();
         NumberAxis ySongAxis = new NumberAxis();
@@ -139,6 +146,7 @@ public class Perf {
         root.getChildren().add(songTimeChart);
     }
 
+    // Starts a timer to periodically update memory usage
     private void startPerformanceUpdater() {
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -149,6 +157,7 @@ public class Perf {
         }, 0, 1000); // Update every second
     }
 
+    // Updates the memory usage chart with current memory data
     private void updateMemoryChart() {
         Runtime runtime = Runtime.getRuntime();
         long usedMemory = (runtime.totalMemory() - runtime.freeMemory()) / (1024 * 1024); // MB
@@ -171,6 +180,7 @@ public class Perf {
         });
     }
 
+    // Dynamically adjusts the Y-axis range for memory usage
     private void adjustYAxis() {
         double maxMemory = memorySeries.getData().stream()
                 .mapToDouble(data -> data.getYValue().doubleValue())
@@ -187,12 +197,5 @@ public class Perf {
 
         yAxis.setLowerBound(lowerBound);
         yAxis.setUpperBound(upperBound);
-    }
-
-    private void initializeSongData() {
-        for (int i = 1; i <= 8; i++) {
-            songTimeData.put(i, 0.0);
-        }
-        updateSongTimeChart();
     }
 }
